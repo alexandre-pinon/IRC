@@ -9,7 +9,8 @@ class Register extends React.Component {
         email: "",
         password: "",
         passwordConfirmation: "",
-        errors: []
+        errors: [],
+        loading: false
     };
 
     isFormValid = () => {
@@ -50,14 +51,14 @@ class Register extends React.Component {
     };
 
     handleSubmit = event => {
-        if (this.isFormValid()) {
         event.preventDefault();
-
+        if (this.isFormValid()) {
+            this.setState({ errors: [], loading: true });
         }
     };
 
     render() {
-        const { username, email, password, passwordConfirmation } = this.state;
+        const { username, email, password, passwordConfirmation, errors, loading } = this.state;
 
         return (
             <Grid textAlign="center" verticalAlign="middle" className="app">
@@ -69,18 +70,18 @@ class Register extends React.Component {
                     <Form onSubmit={this.handleSubmit} size="large">
                         <Segment stacked>
                             <Form.Input fluid name="username" icon="user" iconPosition="left"
-                            placeholder="Username" onChange={this.handleChange} value={username} type="text" />
+                            placeholder="Username" onChange={this.handleChange} value={username} type="text" required />
 
                             <Form.Input fluid name="email" icon="mail" iconPosition="left"
-                            placeholder="Email" onChange={this.handleChange} value={email} type="email" />
+                            placeholder="Email" onChange={this.handleChange} value={email} className={errors.some(error => error.message.toLowerCase().includes('email')) ? 'error' : ''} type="email" required />
 
                             <Form.Input fluid name="password" icon="lock" iconPosition="left"
-                            placeholder="Password" onChange={this.handleChange} value={password} type="password" />
+                            placeholder="Password" onChange={this.handleChange} value={password} type="password" required />
 
                             <Form.Input fluid name="passwordConfirmation" icon="repeat" iconPosition="left"
-                            placeholder="Password Confirmation" onChange={this.handleChange} value={passwordConfirmation} type="password" />
+                            placeholder="Password Confirmation" onChange={this.handleChange} value={passwordConfirmation} type="password" required />
                         
-                            <Button color="blue" fluid size="large">Submit</Button>
+                            <Button disabled={loading} className={loading ? 'loading' : ''} color="blue" fluid size="large">Submit</Button>
 
                         </Segment>
                     </Form>
