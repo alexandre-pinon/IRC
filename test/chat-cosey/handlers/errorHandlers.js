@@ -22,10 +22,14 @@ exports.mongooseErrors = (error, request, response, next) => {
     if (!error.errors) {
         return next(error)
     }
+
     let message = ''
-    error.errors.forEach((err) => (
-        message += err.message + ', '
+    const errorKeys = Object.keys(error.errors)
+
+    errorKeys.forEach((key) => (
+        message += error.errors[key].message + ', '
     ))
+
     message = message.substr(0, message.length - 2)
 
     response.status(400).json({ message })

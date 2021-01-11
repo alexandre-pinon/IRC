@@ -2,7 +2,6 @@ const mongoose = require('mongoose')
 const User = mongoose.model('User')
 const sha256 = require('js-sha256')
 const jwt = require('jwt-then')
-const { request } = require('../app')
 
 exports.register = async (request, response) => {
     const { name, email, password } = request.body
@@ -32,7 +31,7 @@ exports.register = async (request, response) => {
     await user.save()
 
     response.json({
-        message: 'User [' + name + '] registered successfully!'
+        message: `User ${name} registered successfully!`
     })
 }
 
@@ -48,4 +47,9 @@ exports.login = async (request, response) => {
     }
 
     const token = await jwt.sign({ id: user.id }, process.env.SECRET)
+
+    response.json({
+        message: 'User logged in successfully!',
+        token
+    })
 }
