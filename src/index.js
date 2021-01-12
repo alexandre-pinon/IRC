@@ -10,15 +10,20 @@ import 'semantic-ui-css/semantic.min.css';
 
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
-const Root = () => (
-  <Router>
-    <Switch>
-      <Route exact path="/" component={App} />
-      <Route path="/login" component={Login} />
-      <Route path="/register" component={Register} />
-    </Switch>
-  </Router>
-);
+class Root extends React.Component {
+
+  render() {
+    return (
+      <Router>
+        <Switch>
+          <Route exact path="/" component={App} />
+          <Route path="/login" component={Login} />
+          <Route path="/register" component={Register} />
+        </Switch>
+      </Router>
+    );
+  }
+}
 
 ReactDOM.render(
   <React.StrictMode>
