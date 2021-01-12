@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Montserrat&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
 
 * {
   font-family: Montserrat;
@@ -85,4 +85,9 @@ button {
   background: #f7c52a;
   padding: 0.25rem 1rem;
   border-radius: 2px;
+}
+
+a {
+    text-decoration: none;
+    color: #333;
 }

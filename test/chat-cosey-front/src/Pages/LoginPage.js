@@ -1,6 +1,7 @@
 import React from 'react'
 import axios from 'axios'
 import makeToast from '../Toaster'
+import { withRouter } from 'react-router-dom'
 
 const LoginPage = (props) => {
     const emailRef = React.createRef()
@@ -19,6 +20,7 @@ const LoginPage = (props) => {
                 makeToast('success', response.data.message)
                 localStorage.setItem('CC_Token', response.data.token)
                 props.history.push('/dashboard')
+                props.setupSocket()
             })
             .catch((error) => {
                 if (error && error.response && error.response.data && error.response.data.message) {
@@ -57,4 +59,4 @@ const LoginPage = (props) => {
     )
 }
 
-export default LoginPage
+export default withRouter(LoginPage)

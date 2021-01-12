@@ -20,6 +20,49 @@ require('./models/Message')
 
 const app = require('./app')
 
-app.listen(8000, () => {
+const server = app.listen(8000, () => {
     console.log('Server listening on port 8000')
+})
+
+const io = require('socket.io')(server, {
+    cors: {
+        origin: 'http://localhost:3000'
+    }
+})
+const jwt = require('jwt-then')
+
+io.use(async (socket, next) => {
+    try  {
+        const token = socket.handshake.query.token
+        const payload = await jwt.verify(token, process.env.SECRET)
+        socket.userId = payload.id
+        next()
+    } catch (error) {
+        console.log('Socket.io error!', error)
+    }
+})
+
+io.on('connection', (socket) => {
+    console.log('Connected: ' + socket.userId)
+
+    socket.on('disconnect', () => {
+        console.log('Disconnected: ' + socket.userId)
+    })
+
+    socket.on('joinRoom', ({ chatroomId }) => {
+        socket.join(chatroomId)
+        console.log('A user joined chatroom: ' + chatroomId)
+    })
+
+    socket.on('leaveRoom', ({ chatroomId }) => {
+        socket.leave(chatroomId)
+        console.log('A user left chatroom: ' + chatroomId)
+    })
+
+    socket.on('chatroomMessage', ({ chatroomId, message }) => {
+        io.to(chatroomId).emit('newMessage', {
+            message,
+            userId: socket.userId
+        })
+    })
 })
