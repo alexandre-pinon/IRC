@@ -4,20 +4,46 @@ import { withRouter } from 'react-router-dom'
 const ChatroomPage = ({ match, socket }) => {
     const chatroomId = match.params.id
     const [messages, setMessages] = React.useState([])
+    const messageRef = React.useRef()
+    const [userId, setUserId] = React.useState('')
+
+    const sendMessage = () => {
+        if (socket) {
+            socket.emit('chatroomMessage', {
+                chatroomId,
+                message: messageRef.current.value
+            })
+            messageRef.current.value = ''
+        }
+    }
     
-    React.userEffect(() => {
-        socket.emit('joinRoom', {
-            chatroomId
-        })
-
-        socket.on('newMessage', ({message, userId}) => {
-            setMessages(message)
-        })
-
-        return () => {
-            socket.emit('leaveRoom', {
+    React.useEffect(() => {
+        const token = localStorage.getItem('CC_Token')
+        if (token) {
+            const payload = JSON.parse(atob(token.split('.')[1]))
+            setUserId(payload.id)
+        }
+        if (socket) {
+            socket.on('newMessage', (message) => {
+                setMessages([...messages, message])
+            })
+        }
+        //eslint-disable-next-line
+    }, [messages])
+    
+    React.useEffect(() => {
+        if (socket) {
+            socket.emit('joinRoom', {
                 chatroomId
             })
+        }
+
+        return () => {
+            if (socket) {
+                socket.emit('leaveRoom', {
+                    chatroomId
+                })
+            }
         }
         //eslint-disable-next-line
     }, [])
@@ -27,19 +53,32 @@ const ChatroomPage = ({ match, socket }) => {
             <div className='chatroomSection'>
                 <div className='cardHeader'>Chatroom Name</div>
                 <div className='chatroomContent'>
-                    <div className='message'>
-                        <span className='otherMessage'>Keisay:</span> Hello Guys
-                    </div>
-                    <div className='message'>
-                        <span className='ownMessage'>Apino:</span> Hi Keisay
-                    </div>
+                    {messages.map((message, index) => (
+                        <div key={index} className='message'>
+                            <span className={
+                                userId === message.userId 
+                                    ? 'ownMessage'
+                                    : 'otherMessage'
+                            }>
+                                {message.name}
+                            </span>
+                            {' '}{message.message}
+                        </div>
+                    ))}
                 </div>
                 <div className='chatroomActions'>
                     <div>
-                        <input type='text' name='message' placeholder='Say something!' />
+                        <input
+                            type='text'
+                            name='message'
+                            placeholder='Say something!'
+                            ref={messageRef}
+                        />
                     </div>
                     <div>
-                        <button className='join'>Send</button>
+                        <button className='join' onClick={sendMessage}>
+                            Send
+                        </button>
                     </div>
                 </div>
             </div>

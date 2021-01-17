@@ -31,6 +31,9 @@ const io = require('socket.io')(server, {
 })
 const jwt = require('jwt-then')
 
+const Message = mongoose.model('Message')
+const User = mongoose.model('User')
+
 io.use(async (socket, next) => {
     try  {
         const token = socket.handshake.query.token
@@ -59,10 +62,20 @@ io.on('connection', (socket) => {
         console.log('A user left chatroom: ' + chatroomId)
     })
 
-    socket.on('chatroomMessage', ({ chatroomId, message }) => {
-        io.to(chatroomId).emit('newMessage', {
-            message,
-            userId: socket.userId
-        })
+    socket.on('chatroomMessage', async ({ chatroomId, message }) => {
+        if (message.trim().length > 0) {
+            const user = await User.findOne({ _id: socket.userId })
+            const newMessage = new Message({
+                chatroom: chatroomId,
+                user: socket.userId,
+                message: message
+            })
+            io.to(chatroomId).emit('newMessage', {
+                message: message,
+                name: user.name,
+                userId: socket.userId
+            })
+            await newMessage.save()
+        }
     })
 })
