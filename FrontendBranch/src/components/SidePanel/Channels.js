@@ -1,3 +1,4 @@
+import axios from 'axios'
 import React, { useReducer } from 'react'
 import { Menu, Icon, Modal, Form, Input, Button, Label } from 'semantic-ui-react'
 
@@ -5,60 +6,36 @@ class Channels extends React.Component {
     state = {
         channels: [],
         channelName: '',
-        channelDetails: '',
-        channelsRef: '', // Il faut connecter cette variable avec la Database
         modal: false
     }
 
-    componentDidMount() {
-        this.addListeners()
+    getChannels = async () => {
+        try {
+            const response = await axios.get('http://localhost:8000/chatroom', {
+                headers: {
+                    Authorization:
+                        'Bearer ' +
+                        sessionStorage.getItem('CC_Token')
+                }
+            })
+            this.setState({ channels: response.data })
+        } catch (error) {
+            setTimeout(this.getChannels, 3000)
+            console.log('Error retrieving Channels!', error)
+        }
     }
 
-    addListeners = () => {
-        let loadedChannels = []
-        /*
-        this.state.channelsRef.on('child_added', snap => {
-            loadedChannels.push(snap.val())
-            this.setState({ channels: loadedChannels })
-        })
-        */
+    componentDidMount() {
+        this.getChannels()
     }
 
     addChannel = () => {
-        const { channelsRef, channelName, channelDetails } = this.state
 
-        const key= channelsRef.push().key
-
-        const newChannel = {
-            id: key,
-            name: channelName,
-            details: channelDetails,
-            /*
-            createdBy: {
-                name: user.displayName,
-                avatar: user.photoURL,
-            }
-            */
-        }
-
-        channelsRef
-            .child(key)
-            .update(newChannel)
-            .then(() => {
-                this.setState({ channelName: '', channelDetails: '' })
-                this.closeModal()
-                console.log('Channel added')
-            })
-            .catch(err => {
-                console.error(err)
-            })
     }
 
     handleSubmit = event => {
         event.preventDefault()
-        if (this.isFormValid(this.state)) {
-            this.addChannel()
-        }
+        this.addChannel()
     }
 
     handleChange = event => {
@@ -66,26 +43,8 @@ class Channels extends React.Component {
     }
 
     changechannel = channel => {
-        
-        // this.props.setCurrentChannel(channel)
+
     }
-
-    /*
-    displayChannels = channels => (
-        channels.length > 0 && channels.map(channel => (
-            <Menu.Item
-                key={channel.id}
-                onClick={() => console.log(channel)}
-                name={channel.name}
-                style={{ opacity: 0.7 }}
-            >
-                # {channel.name}
-            </Menu.Item>
-        ))
-    )
-    */
-
-    isFormValid = ({ channelName, channelDetails }) => channelName && channelDetails
 
     openModal = () => this.setState({ modal: true })
 
@@ -102,27 +61,21 @@ class Channels extends React.Component {
                     <span>
                         <Icon name='exchange' /> CHANNELS
                     </span> {' '}
-                    ({ channels.length }) <Icon name='add' onClick={this.openModal} />
+                    ({ channels ? channels.length : 0 })
+                    <Icon name='add' onClick={this.openModal} />
                 </Menu.Item>
                 {/* Channels */}
                 {/* this.displayChannels(channels) */}
 
                 {/* Example Channel 1 */}
-                <Menu.Item
+                { channels ? channels.map(channel => (
+                    <Menu.Item
                     onClick={() => console.log('This is a channel')}
                     style={{ opacity: 1.0 }}
                 >
-                    # Genshin Impact
+                    {channel.name}
                 </Menu.Item>
-
-                {/* Example Channel 2 */}
-                <Menu.Item
-                    onClick={() => console.log('This is a channel')}
-                    style={{ opacity: 1.0 }}
-                >
-                    <Label color='red'>2</Label>
-                    # Among Us
-                </Menu.Item>
+                )) : ''}
             </Menu.Menu>
 
             {/* Add Channel Modal */}

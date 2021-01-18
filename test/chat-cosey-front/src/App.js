@@ -19,7 +19,6 @@ function App() {
         }
       })
       
-
       newSocket.on('disconnect', () => {
         setSocket(null)
         setTimeout(setupSocket, 3000)

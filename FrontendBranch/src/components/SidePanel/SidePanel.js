@@ -15,7 +15,7 @@ class SidePanel extends React.Component {
                 vertical
                 style={{ background: '#4c3c4c', fontsize: '1.2rem' }}
             >
-                <UserPanel />
+                <UserPanel history={this.props.history}/>
                 <Starred />
                 <Channels />
                 <DirectMessages />

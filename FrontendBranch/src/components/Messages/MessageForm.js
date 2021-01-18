@@ -15,6 +15,10 @@ class Messageform extends React.Component {
         emojiPicker: false
     }
 
+    handleSubmit = event => {
+        event.preventDefault()
+    }
+
     handleChange = event => {
         this.setState({ [event.target.name]: event.target.value })
       }
@@ -83,7 +87,8 @@ class Messageform extends React.Component {
                 <Button.Group icon widths='2'>
                     <Button
                         color='yellow'
-                        content='Add Reply'
+                        onClick={this.handleSubmit}
+                        content='Send'
                         labelPosition='left'
                         icon='edit'
                     />

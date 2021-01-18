@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const Chatroom = mongoose.model('Chatroom')
+const User = mongoose.model('User')
 
 exports.getAllChatrooms = async (request, response) => {
     const chatrooms = await Chatroom.find({})
@@ -8,7 +9,8 @@ exports.getAllChatrooms = async (request, response) => {
 }
 
 exports.createChatroom = async (request, response) => {
-    const { name } = request.body
+    const { name, userId } = request.body
+    const user = await User.findOne({ _id: userId })
     const nameRegex = /^[A-Za-z\s']+$/
 
     if (!nameRegex.test(name)) {
@@ -22,7 +24,8 @@ exports.createChatroom = async (request, response) => {
     }
 
     const chatroom = new Chatroom({
-        name
+        name,
+        users: [user]
     })
 
     await chatroom.save()

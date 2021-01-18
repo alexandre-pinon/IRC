@@ -6,22 +6,47 @@ import ColorPanel from './ColorPanel/ColorPanel'
 import SidePanel from './SidePanel/SidePanel'
 import Messages from './Messages/Messages'
 import MetaPanel from './MetaPanel/MetaPanel'
+import makeToast from './Toaster'
+import io from 'socket.io-client'
 
 const App = (props) => {
+  const [socket, setSocket] = React.useState(null)
+  const setupSocket = (token) => {
+    if (!socket) {
+      const newSocket = io('http://localhost:8000', {
+        query: {
+            token: token
+        }
+      })
+    
+      newSocket.on('disconnect', () => {
+        setSocket(null)
+        setTimeout(setupSocket, 3000)
+        makeToast('error', 'Socket Disconnected!')
+      })
 
+      newSocket.on('connect', () => {
+        makeToast('success', 'Socket Connected!')
+      })
+
+      setSocket(newSocket)
+    }
+  }
 
   React.useEffect(() => {
     const token = sessionStorage.getItem('CC_Token')
     if (!token) {
-        props.history.push('/login')
+      props.history.push('/login')
+    } else {
+      setupSocket(token)
     }
     // eslint-disable-next-line
-  }, [0])
+  }, [])
 
   return (
     <Grid columns='equal' className='app' style={{ background: '#eee' }}>
       <ColorPanel />
-      <SidePanel />
+      <SidePanel history={props.history}/>
 
       <Grid.Column style={{ marginLeft: 320 }}>
         <Messages />
