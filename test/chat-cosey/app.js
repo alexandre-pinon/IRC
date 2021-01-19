@@ -10,6 +10,7 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use('/user', require('./routes/user'))
 app.use('/chatroom', require('./routes/chatroom'))
+app.use('/message', require('./routes/message'))
 
 const errorHandlers = require('./handlers/errorHandlers')
 app.use(errorHandlers.notFound)

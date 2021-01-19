@@ -11,6 +11,7 @@ import io from 'socket.io-client'
 
 const App = (props) => {
   const [socket, setSocket] = React.useState(null)
+  const [activeChannel, setActiveChannel] = React.useState(null)
   const setupSocket = (token) => {
     if (!socket) {
       const newSocket = io('http://localhost:8000', {
@@ -21,7 +22,7 @@ const App = (props) => {
     
       newSocket.on('disconnect', () => {
         setSocket(null)
-        setTimeout(setupSocket, 3000)
+        setTimeout(setupSocket, 30000)
         makeToast('error', 'Socket Disconnected!')
       })
 
@@ -43,16 +44,25 @@ const App = (props) => {
     // eslint-disable-next-line
   }, [])
 
+  const handleActivateChannel = (channel) => {
+    setActiveChannel(channel)
+  }
+  
+
   return (
     <Grid columns='equal' className='app' style={{ background: '#eee' }}>
       <ColorPanel />
-      <SidePanel history={props.history}/>
+      <SidePanel 
+        history={props.history}
+        callBackActivateChannel = {handleActivateChannel}
+        socket={socket}
+      />
 
-      <Grid.Column style={{ marginLeft: 320 }}>
-        <Messages />
+      <Grid.Column style = {{ marginLeft: 320 }}>
+        <Messages socket = {socket} activeChannel = {activeChannel}/>
       </Grid.Column>
 
-      <Grid.Column width={4}>
+      <Grid.Column width = {4}>
         <MetaPanel />
       </Grid.Column>
       

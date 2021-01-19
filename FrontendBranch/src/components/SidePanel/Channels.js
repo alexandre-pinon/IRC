@@ -6,6 +6,7 @@ class Channels extends React.Component {
     state = {
         channels: [],
         channelName: '',
+        activeChannel: null,
         modal: false
     }
 
@@ -18,15 +19,44 @@ class Channels extends React.Component {
                         sessionStorage.getItem('CC_Token')
                 }
             })
-            this.setState({ channels: response.data })
+            if (response.data.length > 0) {
+                const defaultActiveChannel = response.data[0]
+                this.props.callBackActivateChannel(defaultActiveChannel)
+                this.setState({
+                    channels: response.data,
+                    activeChannel: defaultActiveChannel
+                }, () => {
+                    if (this.props.socket) {
+                        this.props.socket.emit('joinRoom', {
+                            chatroomId: this.state.activeChannel._id
+                        })
+                    }
+                })
+            }
+            
         } catch (error) {
-            setTimeout(this.getChannels, 3000)
+            // setTimeout(this.getChannels, 3000)
             console.log('Error retrieving Channels!', error)
         }
     }
 
     componentDidMount() {
         this.getChannels()
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (
+            this.props.socket &&
+            prevState.activeChannel &&
+            prevState.activeChannel._id !== this.state.activeChannel._id
+        ) {
+            this.props.socket.emit('leaveRoom', {
+                chatroomId: prevState.activeChannel._id
+            })
+            this.props.socket.emit('joinRoom', {
+                chatroomId: this.state.activeChannel._id
+            })
+        }
     }
 
     addChannel = () => {
@@ -42,8 +72,9 @@ class Channels extends React.Component {
         this.setState({ [event.target.name]: event.target.value })
     }
 
-    changechannel = channel => {
-
+    activateChannel = channel => {
+        this.props.callBackActivateChannel(channel)
+        this.setState({ activeChannel: channel })
     }
 
     openModal = () => this.setState({ modal: true })
@@ -69,8 +100,9 @@ class Channels extends React.Component {
 
                 {/* Example Channel 1 */}
                 { channels ? channels.map(channel => (
-                    <Menu.Item
-                    onClick={() => console.log('This is a channel')}
+                <Menu.Item
+                    key={channel._id}
+                    onClick={() => this.activateChannel(channel)}
                     style={{ opacity: 1.0 }}
                 >
                     {channel.name}

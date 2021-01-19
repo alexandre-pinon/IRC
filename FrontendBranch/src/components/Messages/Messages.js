@@ -4,6 +4,7 @@ import MessageForm from './MessageForm'
 import Message from './Message'
 import Typing from './Typing'
 import { Segment, Comment } from 'semantic-ui-react'
+import axios from 'axios'
 
 class Messages extends React.Component {
 
@@ -25,17 +26,34 @@ class Messages extends React.Component {
         }
     }
 
-    /*
-    displayMessages = messages => (
-        messages.length > 0 && messages.map(message => (
-            <Message
-                key={message.timestamp}
-                message={message}
-                user={this.state.user}
-            />
-        ))
-    )
-    */
+    getMessages = async () => {
+        try {
+            const data = { chatroomId: this.props.activeChannel._id }
+            const headers = {
+                Authorization:
+                    'Bearer ' +
+                    sessionStorage.getItem('CC_Token')
+            }
+            const response = await axios.post(
+                'http://localhost:8000/message',
+                data,
+                { headers: headers }
+            )
+            // this.setState({ channels: response.data })
+            console.log(response.data)
+        } catch (error) {
+            // setTimeout(this.getChannels, 3000)
+            console.log('Error retrieving Messages!', error)
+        }
+    }
+
+    componentDidMount() {
+        if (this.props.activeChannel) {this.getMessages()}
+    }
+
+    componentDidUpdate() {
+        if (this.props.activeChannel) {this.getMessages()}
+    }
     
     render() {
 
@@ -53,12 +71,18 @@ class Messages extends React.Component {
                         {/* Messages */}
                         <Message />
                         <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <span className='user__typing'>Apino is typing</span> <Typing />
+                            <span className='user__typing'>
+                                Apino is typing
+                            </span>
+                            <Typing />
                         </div>
                     </Comment.Group>
                 </Segment>
 
-                <MessageForm />
+                <MessageForm 
+                    activeChannel = {this.props.activeChannel}
+                    socket = {this.props.socket}
+                />
             </React.Fragment>
         )
     }
