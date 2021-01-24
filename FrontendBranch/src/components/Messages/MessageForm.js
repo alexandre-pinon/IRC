@@ -7,42 +7,40 @@ import 'emoji-mart/css/emoji-mart.css'
 class Messageform extends React.Component {
     state = {
         newMessage: '',
-        sending: false,
         errors: [],
         modal: false,
         emojiPicker: false
     }
 
-    sendMessage = (message) => {
+    sendMessage = () => {
         if (this.props.socket) {
             this.props.socket.emit('chatroomMessage', {
                 chatroomId: this.props.activeChannel._id,
-                message: message
+                message: this.state.newMessage
             })
-            this.setState({ sending: false })
+            this.setState({ newMessage: '' })
         } else {
             console.log('Error : NO SOCKET!')
         }
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        // console.log({ prevState, state: this.state })
-        // console.log(this.state.sending)
-        // console.log(prevState.newMessage !== this.state.newMessage)
-        if (this.state.sending && prevState.newMessage !== this.state.newMessage) {
-            console.log(this.props.socket)
-            if (this.props.socket) {
-                this.props.socket.on('newMessage', (message) => {
-                    console.log(message)
-                })
-            }
-        }
-    }
+    // componentDidUpdate(prevProps, prevState) {
+    //     // console.log({ prevState, state: this.state })
+    //     // console.log(this.state.sending)
+    //     // console.log(prevState.newMessage !== this.state.newMessage)
+    //     if (this.state.sending && prevState.newMessage !== this.state.newMessage) {
+    //         console.log(this.props.socket)
+    //         if (this.props.socket) {
+    //             this.props.socket.on('newMessage', (message) => {
+    //                 console.log(message)
+    //             })
+    //         }
+    //     }
+    // }
 
     handleSubmit = event => {
         event.preventDefault()
-        const message = this.state.newMessage
-        this.setState({ sending: true, newMessage: '' }, () => this.sendMessage(message))
+        this.sendMessage()
     }
 
     handleChange = event => {
@@ -80,7 +78,7 @@ class Messageform extends React.Component {
 
     render() {
 
-        const { errors, newMessage, sending, modal, emojiPicker } = this.state
+        const { newMessage, errors, modal, emojiPicker } = this.state
 
         return (
             <Segment className='message__form'>

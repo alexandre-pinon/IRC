@@ -27,8 +27,10 @@ class Login extends React.Component {
             })
             .then((response) => {
                 this.setState({ email: '', password: '', loading: false })
-                makeToast('success', response.data.message)
-                sessionStorage.setItem('CC_Token', response.data.token)
+                const { message, token, username } = response.data
+                makeToast('success', message)
+                sessionStorage.setItem('CC_Token', token)
+                sessionStorage.setItem('username', username)
                 this.props.history.push('/')
             })
             .catch((error) => {

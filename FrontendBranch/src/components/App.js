@@ -22,7 +22,7 @@ const App = (props) => {
     
       newSocket.on('disconnect', () => {
         setSocket(null)
-        setTimeout(setupSocket, 30000)
+        setTimeout(setupSocket, 50000)
         makeToast('error', 'Socket Disconnected!')
       })
 

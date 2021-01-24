@@ -10,15 +10,20 @@ class Channels extends React.Component {
         modal: false
     }
 
-    getChannels = async () => {
+    getUserChannels = async () => {
         try {
-            const response = await axios.get('http://localhost:8000/chatroom', {
-                headers: {
-                    Authorization:
-                        'Bearer ' +
-                        sessionStorage.getItem('CC_Token')
+            const token = sessionStorage.getItem('CC_Token')
+            const payload = token ? JSON.parse(atob(token.split('.')[1])) : null
+            const response = await axios.get(
+                'http://localhost:8000/chatroom/' + payload?.id,
+                {
+                    headers: {
+                        Authorization:
+                            'Bearer ' +
+                            sessionStorage.getItem('CC_Token')
+                    }
                 }
-            })
+            )
             if (response.data.length > 0) {
                 const defaultActiveChannel = response.data[0]
                 this.props.callBackActivateChannel(defaultActiveChannel)
@@ -35,13 +40,13 @@ class Channels extends React.Component {
             }
             
         } catch (error) {
-            // setTimeout(this.getChannels, 3000)
+            // setTimeout(this.getUserChannels, 3000)
             console.log('Error retrieving Channels!', error)
         }
     }
 
     componentDidMount() {
-        this.getChannels()
+        this.getUserChannels()
     }
 
     componentDidUpdate(prevProps, prevState) {

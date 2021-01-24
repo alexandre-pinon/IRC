@@ -63,6 +63,10 @@ class UserPanel extends React.Component {
         this.props.history.push('/login')
     }
 
+    componentDidMount() {
+
+    }
+
     render() {
         const { modal, previewImage, croppedImage } = this.state
 
@@ -84,7 +88,7 @@ class UserPanel extends React.Component {
                         trigger={
                             <span>
                                 <Image src={'https://avatarfiles.alphacoders.com/259/thumb-1920-259754.png'} spaced='right' avatar />
-                                Apino
+                                {sessionStorage.getItem('username')}
                             </span>
                         } options={this.dropdownOptions()} />
                     </Header>

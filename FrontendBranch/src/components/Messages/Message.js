@@ -12,15 +12,15 @@ const isOwnMessage = (message, user) => {
 const timeFromNow = timestamp => moment(timestamp).fromNow()
 */ 
 
-const Message = ({ message, user }) => (
+const Message = ({ message, username }) => (
     <Comment>
         <Comment.Avatar src={'https://avatarfiles.alphacoders.com/259/thumb-1920-259754.png'} />
         <Comment.Content className='message__self'>
-            <Comment.Author as='a'>{'Apino'}</Comment.Author>
-            <Comment.Text>{'I\'m playing Genshin Impact everyday!'}</Comment.Text>
+            <Comment.Author as='a'>{username}</Comment.Author>
+            <Comment.Text>{message}</Comment.Text>
         </Comment.Content>
 
-        <Comment.Avatar src={'https://avatarfiles.alphacoders.com/228/228327.jpg'} />
+        {/* <Comment.Avatar src={'https://avatarfiles.alphacoders.com/228/228327.jpg'} />
         <Comment.Content className='message__self'>
             <Comment.Author as='a'>{'Keisay'}</Comment.Author>
             <Comment.Text>{'That\'s cool bro, I prefer to play The Last Of Us, the story is better!'}</Comment.Text>
@@ -57,7 +57,7 @@ const Message = ({ message, user }) => (
             <br></br>
             <br></br>
             <Image src={'https://pbs.twimg.com/media/Elh-MiTVcAAy3l2.jpg'} className='message__image' />
-        </Comment.Content>
+        </Comment.Content> */}
 
     </Comment>
 )

@@ -8,6 +8,49 @@ exports.getAllChatrooms = async (request, response) => {
     response.json(chatrooms)
 }
 
+exports.getChatroomsByUser = async (request, response) => {
+    const userId = request.params.userId
+    const chatrooms = await Chatroom.find({ 'users': userId })
+
+    response.json(chatrooms)
+}
+
+exports.addUserToChatroom = async (request, response) => {
+    const { chatroomId, userId } = request.body
+    const user = await User.findOne({ _id: userId })
+    const chatroom = await Chatroom.findById(chatroomId)
+
+    if (chatroom.users.includes(userId)) {
+        throw `User already in ${chatroom.name}!`
+    }
+
+    await chatroom.users.push(user)
+    await chatroom.save()
+    console.log('JOIN', { chatroomId, userId, user, chatroom })
+
+    response.json({
+        message: `User ${user.name} has joined ${chatroom.name}!`
+    })
+}
+
+exports.deleteUserFromChatroom = async (request, response) => {
+    const { chatroomId, userId } = request.body
+    const user = await User.findOne({ _id: userId })
+    const chatroom = await Chatroom.findById(chatroomId)
+
+    if (!chatroom.users.includes(userId)) {
+        throw `User not present in ${chatroom.name}!`
+    }
+
+    await chatroom.users.pull(user)
+    await chatroom.save()
+    console.log('DELETE', { chatroomId, userId, user, chatroom })
+
+    response.json({
+        message: `User ${user.name} has left ${chatroom.name}!`
+    })
+}
+
 exports.createChatroom = async (request, response) => {
     const { name, userId } = request.body
     const user = await User.findOne({ _id: userId })

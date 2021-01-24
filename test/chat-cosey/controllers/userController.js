@@ -50,6 +50,7 @@ exports.login = async (request, response) => {
 
     response.json({
         message: 'User logged in successfully!',
-        token
+        token,
+        username: user.name
     })
 }

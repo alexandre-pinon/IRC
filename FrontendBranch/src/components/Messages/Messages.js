@@ -10,12 +10,21 @@ class Messages extends React.Component {
 
     state = {
         isChannelStarred: false,
+        messages: [],
     }
 
     handleStar = () => {
         this.setState(prevState => ({
             isChannelStarred: !prevState.isChannelStarred
         }), () => this.starChannel()) 
+    }
+
+    handleMessages = () => {
+        if (this.props.socket) {
+            this.props.socket.on('newMessage', (message) => {
+                this.setState({ messages:[...this.state.messages, message]})
+            })
+        }
     }
 
     starChannel = () => {
@@ -28,7 +37,9 @@ class Messages extends React.Component {
 
     getMessages = async () => {
         try {
-            const data = { chatroomId: this.props.activeChannel._id }
+            const data = {
+                chatroomId: this.props.activeChannel._id,
+            }
             const headers = {
                 Authorization:
                     'Bearer ' +
@@ -39,8 +50,7 @@ class Messages extends React.Component {
                 data,
                 { headers: headers }
             )
-            // this.setState({ channels: response.data })
-            console.log(response.data)
+            this.setState({ messages: response.data })
         } catch (error) {
             // setTimeout(this.getChannels, 3000)
             console.log('Error retrieving Messages!', error)
@@ -51,13 +61,26 @@ class Messages extends React.Component {
         if (this.props.activeChannel) {this.getMessages()}
     }
 
-    componentDidUpdate() {
-        if (this.props.activeChannel) {this.getMessages()}
+    componentDidUpdate(prevProps, prevState) {
+        if (this.props.activeChannel &&
+            prevProps.activeChannel !== this.props.activeChannel
+        ) {
+            this.getMessages()
+        }
+        if (prevProps.socket !== this.props.socket) {
+            this.handleMessages()
+        }
+    }
+
+    componentWillUnmount() {
+        if (this.props.socket) {
+            this.props.socket.off('newMessage')
+        }
     }
     
     render() {
 
-        const { isChannelStarred } = this.state
+        const { isChannelStarred, messages } = this.state
         return (
             <React.Fragment>
                 <MessagesHeader 
@@ -68,14 +91,21 @@ class Messages extends React.Component {
                 
                 <Segment>
                     <Comment.Group className='messages'>
-                        {/* Messages */}
+                        {messages.map((message, key) => (
+                            <Message
+                                key = {key}
+                                message = {message.message}
+                                username = {message.name}
+                            />
+                        ))}
+                        {/* Messages
                         <Message />
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                             <span className='user__typing'>
                                 Apino is typing
                             </span>
                             <Typing />
-                        </div>
+                        </div> */}
                     </Comment.Group>
                 </Segment>
 
