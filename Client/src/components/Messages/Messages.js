@@ -70,6 +70,13 @@ class Messages extends React.Component {
         if (prevProps.socket !== this.props.socket) {
             this.handleMessages()
         }
+        if (this.messages) {
+            this.scrollToBottom();
+        }
+    }
+
+    scrollToBottom = () => {
+        this.messages.scrollIntoView({ behavior: 'smooth' });
     }
 
     componentWillUnmount() {
@@ -106,6 +113,7 @@ class Messages extends React.Component {
                             </span>
                             <Typing />
                         </div> */}
+                        <div ref={node => (this.messages = node)}></div>
                     </Comment.Group>
                 </Segment>
 
