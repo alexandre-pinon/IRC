@@ -27,12 +27,18 @@ class MessagesHeader extends React.Component {
 
                 {/* Channel Search Input */}
                 <Header floated='right'>
+                    <Icon
+                        //onClick={...}
+                        name='sign-out'
+                        color='purple' />
+                    {/*
                     <Input
                         size='mini'
                         icon='search'
                         name='searchTerm'
                         placeholder='Search Messages'
                     />
+                    */}
                 </Header>
             </Segment>
         )
