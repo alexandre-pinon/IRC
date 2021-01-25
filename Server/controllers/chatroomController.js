@@ -27,7 +27,6 @@ exports.addUserToChatroom = async (request, response) => {
 
     await chatroom.users.push(user)
     await chatroom.save()
-    console.log('JOIN', { chatroomId, userId, user, chatroom })
 
     response.json({
         message: `User ${user.name} has joined ${chatroom.name}!`
@@ -45,7 +44,6 @@ exports.deleteUserFromChatroom = async (request, response) => {
 
     await chatroom.users.pull(user)
     await chatroom.save()
-    console.log('DELETE', { chatroomId, userId, user, chatroom })
 
     response.json({
         message: `User ${user.name} has left ${chatroom.name}!`

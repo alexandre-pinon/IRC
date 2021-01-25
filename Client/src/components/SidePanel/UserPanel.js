@@ -1,7 +1,6 @@
 import React from 'react'
 import AvatarEditor from 'react-avatar-editor'
 import { Grid, Header, Icon, Dropdown, Image, Modal, Input, Button } from 'semantic-ui-react'
-import { Socket } from 'socket.io-client'
 import makeToast from '../Toaster'
 
 class UserPanel extends React.Component {

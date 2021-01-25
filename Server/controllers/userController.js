@@ -54,3 +54,12 @@ exports.login = async (request, response) => {
         username: user.name
     })
 }
+
+exports.changeName = async (request, response) => {
+    const { userId, newName } = request.body
+    await User.findByIdAndUpdate(userId, { name: newName })
+
+    response.json({
+        message: `Successfully changed user name to ${newName}!`
+    })
+}

@@ -3,7 +3,8 @@ require('dotenv').config()
 const mongoose = require('mongoose')
 mongoose.connect(process.env.DATABASE, {
     useUnifiedTopology: true,
-    useNewUrlParser: true
+    useNewUrlParser: true,
+    useFindAndModify: false
 })
 
 mongoose.connection.on('error', (error) => {
