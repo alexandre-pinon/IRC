@@ -86,7 +86,7 @@ class Messages extends React.Component {
                 <MessagesHeader 
                     handleStar={this.handleStar}
                     isChannelStarred={isChannelStarred}
-
+                    activeChannel = {this.props.activeChannel}
                 />
                 
                 <Segment>

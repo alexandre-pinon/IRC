@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const Chatroom = mongoose.model('Chatroom')
 const User = mongoose.model('User')
+const Message = mongoose.model('Message')
 
 exports.getAllChatrooms = async (request, response) => {
     const chatrooms = await Chatroom.find({})
@@ -75,5 +76,15 @@ exports.createChatroom = async (request, response) => {
 
     response.json({
         message: 'Chatroom created!'
+    })
+}
+
+exports.deleteChatroom = async (request, response) => {
+    const chatroomId = request.body.chatroomId
+    await Message.deleteMany({ chatroom: chatroomId })
+    await Chatroom.deleteOne({ _id: chatroomId })
+
+    response.json({
+        message: 'mouais'
     })
 }

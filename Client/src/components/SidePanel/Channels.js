@@ -1,6 +1,7 @@
 import axios from 'axios'
 import React, { useReducer } from 'react'
 import { Menu, Icon, Modal, Form, Input, Button, Label } from 'semantic-ui-react'
+import makeToast from '../Toaster'
 
 class Channels extends React.Component {
     state = {
@@ -14,15 +15,10 @@ class Channels extends React.Component {
         try {
             const token = sessionStorage.getItem('CC_Token')
             const payload = token ? JSON.parse(atob(token.split('.')[1])) : null
+            const headers = { Authorization: `Bearer ${token}` }
             const response = await axios.get(
                 'http://localhost:8000/chatroom/' + payload?.id,
-                {
-                    headers: {
-                        Authorization:
-                            'Bearer ' +
-                            sessionStorage.getItem('CC_Token')
-                    }
-                }
+                { headers: headers }
             )
             if (response.data.length > 0) {
                 const defaultActiveChannel = response.data[0]
@@ -38,7 +34,6 @@ class Channels extends React.Component {
                     }
                 })
             }
-            
         } catch (error) {
             // setTimeout(this.getUserChannels, 3000)
             console.log('Error retrieving Channels!', error)
@@ -64,13 +59,41 @@ class Channels extends React.Component {
         }
     }
 
-    addChannel = () => {
-
+    addChannel = async () => {
+        console.log(this.state.channelName)
+        try {
+            const token = sessionStorage.getItem('CC_Token')
+            const payload = token ? JSON.parse(atob(token.split('.')[1])) : null
+            const data = {
+                name: this.state.channelName,
+                userId: payload.id
+            }
+            const headers = { Authorization: `Bearer ${token}` }
+            const response = await axios.post(
+                'http://localhost:8000/chatroom/create',
+                data,
+                { headers: headers }
+            )
+            makeToast('success', response.data.message)
+            this.getUserChannels()
+        } catch (error) {
+            if (error.response?.data?.message) {
+                makeToast('error', error.response.data.message)
+            } else {
+                makeToast('error', 'Internal Server Error')
+                console.log(error)
+            }
+        }
+        this.closeModal()
     }
+
+    isFormValid = () => this.state.channelName.trim() ? true : false
 
     handleSubmit = event => {
         event.preventDefault()
-        this.addChannel()
+        this.isFormValid()
+            ? this.addChannel()
+            : makeToast('error', 'Channel name is empty!')
     }
 
     handleChange = event => {
@@ -84,7 +107,9 @@ class Channels extends React.Component {
 
     openModal = () => this.setState({ modal: true })
 
-    closeModal = () => this.setState({ modal: false })
+    closeModal = () => {
+        this.setState({ modal: false, channelName: '' })
+    }
 
 
     render() {
@@ -130,14 +155,14 @@ class Channels extends React.Component {
                             />
                         </Form.Field>
 
-                        <Form.Field>
+                        {/* <Form.Field>
                             <Input
                                 fluid
                                 label='About the Channel'
                                 name='channelDetails'
                                 onChange={this.handleChange} 
                             />
-                        </Form.Field>
+                        </Form.Field> */}
 
                     </Form>
                 </Modal.Content>

@@ -11,5 +11,6 @@ router.put('/join', auth, catchErrors(chatroomController.addUserToChatroom))
 router.put('/quit', auth, catchErrors(
     chatroomController.deleteUserFromChatroom
 ))
+router.delete('/delete', auth, catchErrors(chatroomController.deleteChatroom))
 
 module.exports = router

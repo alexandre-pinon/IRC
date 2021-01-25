@@ -1,6 +1,7 @@
 import React from 'react'
 import AvatarEditor from 'react-avatar-editor'
 import { Grid, Header, Icon, Dropdown, Image, Modal, Input, Button } from 'semantic-ui-react'
+import { Socket } from 'socket.io-client'
 import makeToast from '../Toaster'
 
 class UserPanel extends React.Component {
@@ -58,6 +59,7 @@ class UserPanel extends React.Component {
 
     handleSignout = () => {
         // Function to sign out of the App
+        this.props.socket.disconnect()
         makeToast('error', 'Socket Disconnected!')
         sessionStorage.removeItem('CC_Token')
         this.props.history.push('/login')

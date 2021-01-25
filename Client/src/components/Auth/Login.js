@@ -86,7 +86,7 @@ class Login extends React.Component {
                                 className={loading ? 'loading' : ''} color='purple'
                                 fluid size='large'
                             >
-                                Submit
+                                Login
                             </Button>
                         </Segment>
                     </Form>

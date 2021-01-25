@@ -61,12 +61,7 @@ class Register extends React.Component {
                 sessionStorage.setItem('CC_Token', response.data.token)
                 this.props.history.push('/login')
             } catch (error) {
-                if (
-                    error &&
-                    error.response &&
-                    error.response.data &&
-                    error.response.data.message
-                ) {
+                if (error.response?.data?.message) {
                     this.setState({
                         password: '',
                         passwordConfirmation: '',
@@ -136,7 +131,7 @@ class Register extends React.Component {
                                 className={loading ? 'loading' : ''} color='blue'
                                 fluid size='large'
                             >
-                                Submit
+                                Register
                             </Button>
                         </Segment>
                     </Form>
