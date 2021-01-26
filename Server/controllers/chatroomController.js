@@ -1,10 +1,11 @@
 const mongoose = require('mongoose')
+const { list } = require('./commandController')
 const Chatroom = mongoose.model('Chatroom')
 const User = mongoose.model('User')
 const Message = mongoose.model('Message')
 
 exports.getAllChatrooms = async (request, response) => {
-    const chatrooms = await Chatroom.find({})
+    const chatrooms = list()
 
     response.json(chatrooms)
 }
@@ -17,9 +18,7 @@ exports.getChatroomsByUser = async (request, response) => {
 }
 
 exports.getChatroomsByString = async (request, response) => {
-    const string = request.body.string
-    const regex = new RegExp(string, 'i')
-    const chatrooms = await Chatroom.find({ 'name': regex })
+    const chatrooms = list(request.body.string)
 
     response.json(chatrooms)
 }

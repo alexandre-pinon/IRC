@@ -23,14 +23,19 @@ class Messages extends React.Component {
     handleMessages = () => {
         if (this.props.socket) {
             this.props.socket.on('newMessage', (message) => {
-                this.setState({ messages:[...this.state.messages, message]})
+                this.setState({ messages:[...this.state.messages, message] })
             })
-            this.props.socket.on('command', (response) => {
+            this.props.socket.on('nick', (response) => {
                 this.setUsername(response.newName)
                 sessionStorage.setItem('username', response.newName)
                 this.getMessages()
                 makeToast('success', response.message)
                 // this.props.history.go(0)
+            })
+            this.props.socket.on('list', (message) => {
+                console.log(message)
+                this.setState({ messages:[...this.state.messages, message] })
+                console.log(this.state.messages)
             })
         }
     }
@@ -85,8 +90,7 @@ class Messages extends React.Component {
 
     componentWillUnmount() {
         if (this.props.socket) {
-            this.props.socket.off('newMessage')
-            this.props.socket.off('command')
+            this.props.socket.removeAllListeners();
         }
     }
 

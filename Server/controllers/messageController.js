@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const { nick } = require('./commandController')
+const { nick, list } = require('./commandController')
 const Message = mongoose.model('Message')
 const User = mongoose.model('User')
 
@@ -20,10 +20,13 @@ exports.getMessagesByChatroom = async (request, response) => {
     response.json(messages)
 }
 
-exports.handleCommands = (message, socket) => {
+exports.handleCommands = async (message, socket) => {
 
     const command = message.split(' ')[0]
-    const argument = message.split(' ')[1]
+    const argument1 = message.split(' ')[1]
+    const argument2 = message.split(' ')[2]
+    const argument = argument2 ? `${argument1} ${argument2}` : argument1
+    const user = await User.findOne({ _id: socket.userId })
     
     let commands = {
         '/nick': async () => {
@@ -33,10 +36,24 @@ exports.handleCommands = (message, socket) => {
                 message: message,
                 newName: argument
             }
-            socket.emit('command', response)
+            socket.emit('nick', response)
         },
-        '/list': () => {
+        '/list': async () => {
             console.log('list', argument)
+            const chatrooms = argument ? await list(argument) : await list()
+            let response = {
+                name: 'PlooV4',
+                userId: socket.userId
+            }
+            if (chatrooms.length > 0) {
+                const message = chatrooms
+                                    .map(chatroom => chatroom.name)
+                                    .join(', ')
+                response.message = `Available channels : ${message}`
+            } else {
+                response.message = 'No channels found!'
+            }
+            socket.emit('list', response)
         },
         '/create': () => {
             console.log('create', argument)
