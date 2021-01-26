@@ -22,16 +22,17 @@ class Channels extends React.Component {
             )
             if (response.data.length > 0) {
                 const defaultActiveChannel = response.data[0]
-                this.props.callBackActivateChannel(defaultActiveChannel)
                 this.setState({
                     channels: response.data,
-                    activeChannel: defaultActiveChannel
                 }, () => {
-                    if (this.props.socket) {
-                        this.props.socket.emit('joinRoom', {
-                            chatroomId: this.state.activeChannel._id
-                        })
+                    const { channels, activeChannel} = this.state
+                    const wrongActiveChannel = !channels.some(
+                            channel => channel?.name === activeChannel?.name
+                    )
+                    if (wrongActiveChannel) {
+                        this.activateChannel(defaultActiveChannel)
                     }
+                    this.props.socket?.emit('channels refreshed')
                 })
             }
         } catch (error) {
@@ -41,8 +42,11 @@ class Channels extends React.Component {
     }
 
     initSocket = () => {
-        this.props.socket.on('refresh channels', () => {
+        this.props.socket?.on('refresh channels', () => {
             this.getUserChannels()
+        })
+        this.props.socket?.on('activate channel', (response) => {
+            this.activateChannel(response.chatroom)
         })
     }
 
@@ -55,14 +59,20 @@ class Channels extends React.Component {
             this.initSocket()
         }
         if (
-            this.props.socket &&
             prevState.activeChannel &&
             prevState.activeChannel._id !== this.state.activeChannel._id
         ) {
-            this.props.socket.emit('leaveRoom', {
+            this.props.socket?.emit('leaveRoom', {
                 chatroomId: prevState.activeChannel._id
             })
-            this.props.socket.emit('joinRoom', {
+            this.props.socket?.emit('joinRoom', {
+                chatroomId: this.state.activeChannel._id
+            })
+        } else if (
+            !prevState.activeChannel &&
+            prevState.activeChannel !== this.state.activeChannel
+        ) {
+            this.props.socket?.emit('joinRoom', {
                 chatroomId: this.state.activeChannel._id
             })
         }
@@ -75,7 +85,6 @@ class Channels extends React.Component {
     }
 
     addChannel = async () => {
-        console.log(this.state.channelName)
         try {
             const token = sessionStorage.getItem('CC_Token')
             const payload = token ? JSON.parse(atob(token.split('.')[1])) : null
@@ -90,7 +99,8 @@ class Channels extends React.Component {
                 { headers: headers }
             )
             makeToast('success', response.data.message)
-            this.getUserChannels()
+            await this.getUserChannels()
+            this.activateChannel(response.data.chatroom)
         } catch (error) {
             if (error.response?.data?.message) {
                 makeToast('error', error.response.data.message)

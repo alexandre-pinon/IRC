@@ -48,8 +48,12 @@ exports.create = async (userId, name) => {
     })
 
     await chatroom.save()
+    const response = {
+        chatroom: chatroom,
+        message: 'Chatroom created!'
+    }
 
-    return 'Chatroom created!'
+    return response
 }
 
 exports.delete = async (name) => {

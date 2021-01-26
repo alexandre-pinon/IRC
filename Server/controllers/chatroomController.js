@@ -5,7 +5,7 @@ const User = mongoose.model('User')
 
 exports.getAllChatrooms = async (request, response) => {
     try {
-        const chatrooms = chatCommand.list()
+        const chatrooms = await chatCommand.list()
         response.json(chatrooms)
     } catch (error) {
         throw error
@@ -21,7 +21,7 @@ exports.getChatroomsByUser = async (request, response) => {
 
 exports.getChatroomsByString = async (request, response) => {
     try {
-        const chatrooms = chatCommand.list(request.body.string)
+        const chatrooms = await chatCommand.list(request.body.string)
         response.json(chatrooms)
     } catch (error) {
         throw error
@@ -65,9 +65,10 @@ exports.deleteUserFromChatroom = async (request, response) => {
 exports.createChatroom = async (request, response) => {
     const { name, userId } = request.body
     try {
-        const message = chatCommand.create(userId, name)
+        const res = await chatCommand.create(userId, name)
         response.json({
-            message: message
+            chatroom: res.chatroom,
+            message: res.message
         })
     } catch (error) {
         throw error
@@ -77,7 +78,7 @@ exports.createChatroom = async (request, response) => {
 exports.deleteChatroom = async (request, response) => {
     const name = request.body.name
     try {
-        const message = chatCommand.delete(name)
+        const message = await chatCommand.delete(name)
         response.json({
             message: message
         })

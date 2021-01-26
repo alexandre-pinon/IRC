@@ -82,9 +82,7 @@ class Messages extends React.Component {
         if (prevProps.socket !== this.props.socket) {
             this.handleMessages()
         }
-        if (this.messages) {
-            this.scrollToBottom();
-        }
+        this.scrollToBottom()
     }
 
     componentWillUnmount() {
@@ -98,7 +96,7 @@ class Messages extends React.Component {
     }
 
     scrollToBottom = () => {
-        this.messages.scrollIntoView({ behavior: 'smooth' });
+        this.messages?.scrollIntoView({ behavior: 'smooth' });
     }
     
     render() {

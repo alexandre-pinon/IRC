@@ -15,17 +15,18 @@ exports.getMessagesByChatroom = async (request, response) => {
         userId: messageTable.user._id
     }))
 
-    console.log('GET')
 
     response.json(messages)
 }
 
 exports.handleCommands = (message, socket) => {
 
-    const command = message.split(' ')[0]
-    const argument1 = message.split(' ')[1]
-    const argument2 = message.split(' ')[2]
-    const argument = argument2 ? `${argument1} ${argument2}` : argument1
+    // const command = message.split(' ')[0]
+    // const argument1 = message.split(' ')[1]
+    // const argument2 = message.split(' ')[2]
+    let [command, ...argument] = message.split(' ')
+    argument = argument.join(' ')
+    // const argument = argument2 ? `${argument1} ${argument2}` : argument1
     
     let commands = {
         '/nick': async () => {
@@ -65,15 +66,15 @@ exports.handleCommands = (message, socket) => {
         },
         '/create': async () => {
             try {
-                const message = await chatCommand.create(
+                const response = await chatCommand.create(
                     socket.userId,
                     argument
                 )
-                const response = {
-                    message: message
-                }
                 socket.emit('ok', response)
                 socket.emit('refresh channels')
+                socket.once('channels refreshed', () => {
+                    socket.emit('activate channel', response)
+                })
             } catch (error) {
                 const response = {
                     error: error
