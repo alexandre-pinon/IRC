@@ -1,13 +1,15 @@
 const mongoose = require('mongoose')
-const { list, create } = require('./commandController')
+const chatCommand = require('./commandController')
 const Chatroom = mongoose.model('Chatroom')
 const User = mongoose.model('User')
-const Message = mongoose.model('Message')
 
 exports.getAllChatrooms = async (request, response) => {
-    const chatrooms = list()
-
-    response.json(chatrooms)
+    try {
+        const chatrooms = chatCommand.list()
+        response.json(chatrooms)
+    } catch (error) {
+        throw error
+    }
 }
 
 exports.getChatroomsByUser = async (request, response) => {
@@ -18,9 +20,12 @@ exports.getChatroomsByUser = async (request, response) => {
 }
 
 exports.getChatroomsByString = async (request, response) => {
-    const chatrooms = list(request.body.string)
-
-    response.json(chatrooms)
+    try {
+        const chatrooms = chatCommand.list(request.body.string)
+        response.json(chatrooms)
+    } catch (error) {
+        throw error
+    }
 }
 
 exports.addUserToChatroom = async (request, response) => {
@@ -60,7 +65,7 @@ exports.deleteUserFromChatroom = async (request, response) => {
 exports.createChatroom = async (request, response) => {
     const { name, userId } = request.body
     try {
-        const message = create(userId, name)
+        const message = chatCommand.create(userId, name)
         response.json({
             message: message
         })
@@ -70,11 +75,13 @@ exports.createChatroom = async (request, response) => {
 }
 
 exports.deleteChatroom = async (request, response) => {
-    const chatroomId = request.body.chatroomId
-    await Message.deleteMany({ chatroom: chatroomId })
-    await Chatroom.deleteOne({ _id: chatroomId })
-
-    response.json({
-        message: 'mouais'
-    })
+    const name = request.body.name
+    try {
+        const message = chatCommand.delete(name)
+        response.json({
+            message: message
+        })
+    } catch (error) {
+        throw error
+    }
 }

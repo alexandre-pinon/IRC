@@ -58,9 +58,12 @@ exports.login = async (request, response) => {
 
 exports.changeName = async (request, response) => {
     const { userId, newName } = request.body
-    const message = nick(userId, newName)
-
-    response.json({
-        message: message
-    })
+    try {
+        const message = await nick(userId, newName)
+        response.json({
+            message: message
+        })
+    } catch (error) {
+        throw error        
+    }
 }

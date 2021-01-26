@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const { nick, list, create } = require('./commandController')
+const chatCommand = require('./commandController')
 const Message = mongoose.model('Message')
 const User = mongoose.model('User')
 
@@ -20,52 +20,22 @@ exports.getMessagesByChatroom = async (request, response) => {
     response.json(messages)
 }
 
-exports.handleCommands = async (message, socket) => {
+exports.handleCommands = (message, socket) => {
 
     const command = message.split(' ')[0]
     const argument1 = message.split(' ')[1]
     const argument2 = message.split(' ')[2]
     const argument = argument2 ? `${argument1} ${argument2}` : argument1
-    const user = await User.findOne({ _id: socket.userId })
     
     let commands = {
         '/nick': async () => {
-            console.log('nick', argument)
-            const message = await nick(socket.userId, argument)
-            const response = {
-                message: message,
-                newName: argument
-            }
-            socket.emit('nick', response)
-            socket.emit('ok', response)
-        },
-        '/list': async () => {
-            console.log('list', argument)
-            const chatrooms = argument ? await list(argument) : await list()
-            let response = {
-                name: 'PlooV4',
-                userId: socket.userId
-            }
-            if (chatrooms.length > 0) {
-                const message = chatrooms
-                                    .map(chatroom => chatroom.name)
-                                    .join(', ')
-                response.message = `Available channels : ${message}`
-                socket.emit('newMessage', response)
-            } else {
-                const response = {
-                    error: 'No channels found!'
-                }
-                socket.emit('error', response)
-            }
-        },
-        '/create': async () => {
-            console.log('create', argument)
             try {
-                const message = await create(socket.userId, argument)
+                const message = await chatCommand.nick(socket.userId, argument)
                 const response = {
-                    message: message
+                    message: message,
+                    newName: argument
                 }
+                socket.emit('nick', response)
                 socket.emit('ok', response)
             } catch (error) {
                 const response = {
@@ -74,8 +44,57 @@ exports.handleCommands = async (message, socket) => {
                 socket.emit('error', response)
             }
         },
-        '/delete': () => {
-            console.log('delete', argument)
+        '/list': async () => {
+            try {
+                const chatrooms = await chatCommand.list(argument)
+                let response = {
+                    name: 'PlooV4',
+                    userId: socket.userId
+                }
+                const message = chatrooms
+                                    .map(chatroom => chatroom.name)
+                                    .join(', ')
+                response.message = `Available channels : ${message}`
+                socket.emit('newMessage', response)
+            } catch (error) {
+                const response = {
+                    error: error
+                }
+                socket.emit('error', response)
+            }
+        },
+        '/create': async () => {
+            try {
+                const message = await chatCommand.create(
+                    socket.userId,
+                    argument
+                )
+                const response = {
+                    message: message
+                }
+                socket.emit('ok', response)
+                socket.emit('refresh channels')
+            } catch (error) {
+                const response = {
+                    error: error
+                }
+                socket.emit('error', response)
+            }
+        },
+        '/delete': async () => {
+            try {
+                const message = await chatCommand.delete(argument)
+                const response = {
+                    message: message
+                }
+                socket.emit('ok', response)
+                socket.emit('refresh channels')
+            } catch (error) {
+                const response = {
+                    error: error
+                }
+                socket.emit('error', response)
+            }
         },
         '/join': () => {
             console.log('join', argument)

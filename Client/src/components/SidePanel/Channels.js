@@ -40,11 +40,20 @@ class Channels extends React.Component {
         }
     }
 
+    initSocket = () => {
+        this.props.socket.on('refresh channels', () => {
+            this.getUserChannels()
+        })
+    }
+
     componentDidMount() {
         this.getUserChannels()
     }
 
     componentDidUpdate(prevProps, prevState) {
+        if (prevProps.socket !== this.props.socket) {
+            this.initSocket()
+        }
         if (
             this.props.socket &&
             prevState.activeChannel &&
@@ -56,6 +65,12 @@ class Channels extends React.Component {
             this.props.socket.emit('joinRoom', {
                 chatroomId: this.state.activeChannel._id
             })
+        }
+    }
+
+    componentWillUnmount() {
+        if (this.props.socket) {
+            this.props.socket.removeAllListeners();
         }
     }
 

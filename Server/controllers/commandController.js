@@ -1,30 +1,31 @@
 const mongoose = require('mongoose')
 const User = mongoose.model('User')
 const Chatroom = mongoose.model('Chatroom')
+const Message = mongoose.model('Message')
 
 exports.nick = async (userId, newName) => {
+    if (paramIsEmpty(newName)) {
+        throw 'Name field is empty!'
+    }
+
     await User.findByIdAndUpdate(userId, { name: newName })
 
     return `Successfully changed user name to ${newName}!`
 }
 
-exports.list = async () => {
-    const chatrooms = await Chatroom.find({})
-
-    return chatrooms
-}
-
 exports.list = async (string) => {
     const regex = new RegExp(string, 'i')
     const chatrooms = await Chatroom.find({ 'name': regex })
+    if (!chatrooms.length) {
+        throw 'No channels found!'
+    }
 
     return chatrooms
 }
 
 exports.create = async (userId, name) => {
 
-    const nameIsEmpty = !name || !name.trim()
-    if (nameIsEmpty) {
+    if (paramIsEmpty(name)) {
         throw 'Name field is empty!'
     }
 
@@ -49,4 +50,24 @@ exports.create = async (userId, name) => {
     await chatroom.save()
 
     return 'Chatroom created!'
+}
+
+exports.delete = async (name) => {
+    if (paramIsEmpty(name)) {
+        throw 'Name field is empty!'
+    }
+
+    const chatroom = await Chatroom.findOne({ name })
+
+    if (!chatroom) {
+        throw 'Channels does not exist!'
+    }
+    await Message.deleteMany({ chatroom: chatroom._id })
+    await chatroom.delete()
+
+    return 'Chatroom deleted!'
+}
+
+paramIsEmpty = (param) => {
+    return !param || !param.trim()
 }
