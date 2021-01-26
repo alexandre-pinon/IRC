@@ -31,6 +31,7 @@ const io = require('socket.io')(server, {
     }
 })
 const jwt = require('jwt-then')
+const { handleCommands, handleMessage } = require('./controllers/messageController')
 
 const Message = mongoose.model('Message')
 const User = mongoose.model('User')
@@ -65,18 +66,11 @@ io.on('connection', (socket) => {
 
     socket.on('chatroomMessage', async ({ chatroomId, message }) => {
         if (message.trim().length > 0) {
-            const user = await User.findOne({ _id: socket.userId })
-            const newMessage = new Message({
-                chatroom: chatroomId,
-                user: socket.userId,
-                message: message
-            })
-            io.to(chatroomId).emit('newMessage', {
-                message: message,
-                name: user.name,
-                userId: socket.userId
-            })
-            await newMessage.save()
+            if (message[0].includes('/')) {
+                handleCommands(message, socket)
+            } else {
+                handleMessage(chatroomId, message, socket, io)
+            }
         }
     })
 })

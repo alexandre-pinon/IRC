@@ -9,6 +9,10 @@ const chatroomSchema = new mongoose.Schema({
         type: [mongoose.Schema.Types.ObjectId],
         required: 'User is required!',
         ref: 'User'
+    },
+    private: {
+        type: Boolean,
+        default: false
     }
 })
 

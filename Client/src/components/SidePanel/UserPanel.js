@@ -58,7 +58,7 @@ class UserPanel extends React.Component {
 
     handleSignout = () => {
         // Function to sign out of the App
-        this.props.socket.disconnect()
+        this.props.socket?.disconnect()
         makeToast('error', 'Socket Disconnected!')
         sessionStorage.removeItem('CC_Token')
         this.props.history.push('/login')
@@ -89,7 +89,7 @@ class UserPanel extends React.Component {
                         trigger={
                             <span>
                                 <Image src={'https://avatarfiles.alphacoders.com/259/thumb-1920-259754.png'} spaced='right' avatar />
-                                {sessionStorage.getItem('username')}
+                                {this.props.username}
                             </span>
                         } options={this.dropdownOptions()} />
                     </Header>

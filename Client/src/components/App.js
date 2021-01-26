@@ -12,6 +12,9 @@ import io from 'socket.io-client'
 const App = (props) => {
   const [socket, setSocket] = React.useState(null)
   const [activeChannel, setActiveChannel] = React.useState(null)
+  const [username, setUsername] = React.useState(
+    sessionStorage.getItem('username')
+  )
   const setupSocket = (token) => {
     if (!socket) {
       const newSocket = io('http://localhost:8000', {
@@ -47,6 +50,9 @@ const App = (props) => {
   const handleActivateChannel = (channel) => {
     setActiveChannel(channel)
   }
+  const handleSetUsername = (newName) => {
+    setUsername(newName)
+  }
   
 
   return (
@@ -56,10 +62,16 @@ const App = (props) => {
         history={props.history}
         callBackActivateChannel = {handleActivateChannel}
         socket={socket}
+        username={username}
       />
 
       <Grid.Column style = {{ marginLeft: 320 }}>
-        <Messages socket = {socket} activeChannel = {activeChannel}/>
+        <Messages
+          history={props.history}
+          callBackSetUsername = {handleSetUsername}
+          socket = {socket}
+          activeChannel = {activeChannel}
+        />
       </Grid.Column>
 
       <Grid.Column width = {4}>

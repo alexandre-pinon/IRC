@@ -18,6 +18,7 @@ class SidePanel extends React.Component {
                 <UserPanel
                     history={this.props.history}
                     socket={this.props.socket}
+                    username={this.props.username}
                 />
                 <Starred />
                 <Channels

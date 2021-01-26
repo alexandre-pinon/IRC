@@ -16,6 +16,14 @@ exports.getChatroomsByUser = async (request, response) => {
     response.json(chatrooms)
 }
 
+exports.getChatroomsByString = async (request, response) => {
+    const string = request.body.string
+    const regex = new RegExp(string, 'i')
+    const chatrooms = await Chatroom.find({ 'name': regex })
+
+    response.json(chatrooms)
+}
+
 exports.addUserToChatroom = async (request, response) => {
     const { chatroomId, userId } = request.body
     const user = await User.findOne({ _id: userId })

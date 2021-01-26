@@ -24,20 +24,6 @@ class Messageform extends React.Component {
         }
     }
 
-    // componentDidUpdate(prevProps, prevState) {
-    //     // console.log({ prevState, state: this.state })
-    //     // console.log(this.state.sending)
-    //     // console.log(prevState.newMessage !== this.state.newMessage)
-    //     if (this.state.sending && prevState.newMessage !== this.state.newMessage) {
-    //         console.log(this.props.socket)
-    //         if (this.props.socket) {
-    //             this.props.socket.on('newMessage', (message) => {
-    //                 console.log(message)
-    //             })
-    //         }
-    //     }
-    // }
-
     handleSubmit = event => {
         event.preventDefault()
         this.sendMessage()

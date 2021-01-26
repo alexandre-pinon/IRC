@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const User = mongoose.model('User')
 const sha256 = require('js-sha256')
 const jwt = require('jwt-then')
+const { nick } = require('./commandController')
 
 exports.register = async (request, response) => {
     const { name, email, password } = request.body
@@ -57,9 +58,9 @@ exports.login = async (request, response) => {
 
 exports.changeName = async (request, response) => {
     const { userId, newName } = request.body
-    await User.findByIdAndUpdate(userId, { name: newName })
+    const message = nick(userId, newName)
 
     response.json({
-        message: `Successfully changed user name to ${newName}!`
+        message: message
     })
 }

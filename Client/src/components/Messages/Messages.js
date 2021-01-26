@@ -5,6 +5,7 @@ import Message from './Message'
 import Typing from './Typing'
 import { Segment, Comment } from 'semantic-ui-react'
 import axios from 'axios'
+import makeToast from '../Toaster'
 
 class Messages extends React.Component {
 
@@ -23,6 +24,13 @@ class Messages extends React.Component {
         if (this.props.socket) {
             this.props.socket.on('newMessage', (message) => {
                 this.setState({ messages:[...this.state.messages, message]})
+            })
+            this.props.socket.on('command', (response) => {
+                this.setUsername(response.newName)
+                sessionStorage.setItem('username', response.newName)
+                this.getMessages()
+                makeToast('success', response.message)
+                // this.props.history.go(0)
             })
         }
     }
@@ -75,14 +83,19 @@ class Messages extends React.Component {
         }
     }
 
-    scrollToBottom = () => {
-        this.messages.scrollIntoView({ behavior: 'smooth' });
-    }
-
     componentWillUnmount() {
         if (this.props.socket) {
             this.props.socket.off('newMessage')
+            this.props.socket.off('command')
         }
+    }
+
+    setUsername = (newName) => {
+        this.props.callBackSetUsername(newName)
+    }
+
+    scrollToBottom = () => {
+        this.messages.scrollIntoView({ behavior: 'smooth' });
     }
     
     render() {
