@@ -25,17 +25,16 @@ class Messages extends React.Component {
             this.props.socket.on('newMessage', (message) => {
                 this.setState({ messages:[...this.state.messages, message] })
             })
+            this.props.socket.on('ok', (response) => {
+                makeToast('success', response.message)
+            })
+            this.props.socket.on('error', (response) => {
+                makeToast('error', response.error)
+            })
             this.props.socket.on('nick', (response) => {
                 this.setUsername(response.newName)
                 sessionStorage.setItem('username', response.newName)
                 this.getMessages()
-                makeToast('success', response.message)
-                // this.props.history.go(0)
-            })
-            this.props.socket.on('list', (message) => {
-                console.log(message)
-                this.setState({ messages:[...this.state.messages, message] })
-                console.log(this.state.messages)
             })
         }
     }

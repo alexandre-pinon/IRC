@@ -20,3 +20,33 @@ exports.list = async (string) => {
 
     return chatrooms
 }
+
+exports.create = async (userId, name) => {
+
+    const nameIsEmpty = !name || !name.trim()
+    if (nameIsEmpty) {
+        throw 'Name field is empty!'
+    }
+
+    const user = await User.findOne({ _id: userId })
+    const nameRegex = /^[A-Za-z\s']+$/
+
+    if (!nameRegex.test(name)) {
+        throw 'Chatroom name can contain only alphabets.'
+    }
+
+    const chatroomExists = await Chatroom.findOne({ name })
+
+    if (chatroomExists) {
+        throw 'Chatroom with that name already exists!'
+    }
+
+    const chatroom = new Chatroom({
+        name,
+        users: [user]
+    })
+
+    await chatroom.save()
+
+    return 'Chatroom created!'
+}

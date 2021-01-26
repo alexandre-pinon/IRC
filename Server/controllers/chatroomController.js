@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const { list } = require('./commandController')
+const { list, create } = require('./commandController')
 const Chatroom = mongoose.model('Chatroom')
 const User = mongoose.model('User')
 const Message = mongoose.model('Message')
@@ -59,29 +59,14 @@ exports.deleteUserFromChatroom = async (request, response) => {
 
 exports.createChatroom = async (request, response) => {
     const { name, userId } = request.body
-    const user = await User.findOne({ _id: userId })
-    const nameRegex = /^[A-Za-z\s']+$/
-
-    if (!nameRegex.test(name)) {
-        throw 'Chatroom name can contain only alphabets.'
+    try {
+        const message = create(userId, name)
+        response.json({
+            message: message
+        })
+    } catch (error) {
+        throw error
     }
-
-    const chatroomExists = await Chatroom.findOne({ name })
-
-    if (chatroomExists) {
-        throw 'Chatroom with that name already exists!'
-    }
-
-    const chatroom = new Chatroom({
-        name,
-        users: [user]
-    })
-
-    await chatroom.save()
-
-    response.json({
-        message: 'Chatroom created!'
-    })
 }
 
 exports.deleteChatroom = async (request, response) => {

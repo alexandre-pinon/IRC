@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const { nick, list } = require('./commandController')
+const { nick, list, create } = require('./commandController')
 const Message = mongoose.model('Message')
 const User = mongoose.model('User')
 
@@ -37,6 +37,7 @@ exports.handleCommands = async (message, socket) => {
                 newName: argument
             }
             socket.emit('nick', response)
+            socket.emit('ok', response)
         },
         '/list': async () => {
             console.log('list', argument)
@@ -50,13 +51,28 @@ exports.handleCommands = async (message, socket) => {
                                     .map(chatroom => chatroom.name)
                                     .join(', ')
                 response.message = `Available channels : ${message}`
+                socket.emit('newMessage', response)
             } else {
-                response.message = 'No channels found!'
+                const response = {
+                    error: 'No channels found!'
+                }
+                socket.emit('error', response)
             }
-            socket.emit('list', response)
         },
-        '/create': () => {
+        '/create': async () => {
             console.log('create', argument)
+            try {
+                const message = await create(socket.userId, argument)
+                const response = {
+                    message: message
+                }
+                socket.emit('ok', response)
+            } catch (error) {
+                const response = {
+                    error: error
+                }
+                socket.emit('error', response)
+            }
         },
         '/delete': () => {
             console.log('delete', argument)
