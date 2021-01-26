@@ -43,6 +43,28 @@ class Messages extends React.Component {
         }
     }
 
+    deleteMessages = async () => {
+        try {
+            const data = {
+                chatroomId: this.props.activeChannel._id,
+            }
+            const headers = {
+                Authorization:
+                    'Bearer ' +
+                    sessionStorage.getItem('CC_Token')
+            }
+            const response = await axios.post(
+                'http://localhost:8000/chatroom/delete',
+                data,
+                { headers: headers }
+            )
+            this.setState({ deleteMessages: response.data })
+        } catch (error) {
+            // setTimeout(this.getChannels, 3000)
+            console.log('Error retrieving Messages!', error)
+        }
+    }
+
     getMessages = async () => {
         try {
             const data = {
