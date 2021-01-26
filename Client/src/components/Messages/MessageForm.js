@@ -24,6 +24,13 @@ class Messageform extends React.Component {
         }
     }
 
+    handleKeyDown = event => {
+        this.setState({ [event.target.name]: event.target.value })
+        if (event.keyCode === 13) {
+            this.sendMessage();
+        }
+    }
+
     handleSubmit = event => {
         event.preventDefault()
         this.sendMessage()
@@ -81,6 +88,7 @@ class Messageform extends React.Component {
                     fluid
                     name='newMessage'
                     onChange={this.handleChange}
+                    onKeyDown={this.handleKeyDown}
                     style={{ marginBottom: '0.7em' }}
                     value={newMessage}
                     label={
