@@ -19,14 +19,10 @@ exports.getMessagesByChatroom = async (request, response) => {
     response.json(messages)
 }
 
-exports.handleCommands = (message, socket) => {
+exports.handleCommands = (chatroomId, message, socket, io) => {
 
-    // const command = message.split(' ')[0]
-    // const argument1 = message.split(' ')[1]
-    // const argument2 = message.split(' ')[2]
     let [command, ...argument] = message.split(' ')
     argument = argument.join(' ')
-    // const argument = argument2 ? `${argument1} ${argument2}` : argument1
     
     let commands = {
         '/nick': async () => {
@@ -100,8 +96,26 @@ exports.handleCommands = (message, socket) => {
         '/join': () => {
             console.log('join', argument)
         },
-        '/quit': () => {
+        '/quit': async () => {
             console.log('quit', argument)
+            try {
+                const response = await chatCommand.quit(
+                    socket.userId,
+                    argument
+                )
+                io.to(chatroomId).emit('newMessage', {
+                    message: response.generalMessage,
+                    name: user.name,
+                    userId: socket.userId
+                })
+                socket.emit('error', response)
+                socket.emit('refresh channels')
+            } catch (error) {
+                const response = {
+                    error: error
+                }
+                socket.emit('error', response)
+            }
         },
         '/users': () => {
             console.log('users', argument)
@@ -111,6 +125,10 @@ exports.handleCommands = (message, socket) => {
         },
         'default': () => {
             console.log('default', argument)
+            const response = {
+                error: 'Unknown command!'
+            }
+            socket.emit('error', response)
         }
     };
 

@@ -46,20 +46,15 @@ exports.addUserToChatroom = async (request, response) => {
 }
 
 exports.deleteUserFromChatroom = async (request, response) => {
-    const { chatroomId, userId } = request.body
-    const user = await User.findOne({ _id: userId })
-    const chatroom = await Chatroom.findById(chatroomId)
-
-    if (!chatroom.users.includes(userId)) {
-        throw `User not present in ${chatroom.name}!`
+    const { name, userId } = request.body
+    try {
+        const message = await chatCommand.quit(userId, name)
+        response.json({
+            message: message
+        })
+    } catch (error) {
+        throw error
     }
-
-    await chatroom.users.pull(user)
-    await chatroom.save()
-
-    response.json({
-        message: `User ${user.name} has left ${chatroom.name}!`
-    })
 }
 
 exports.createChatroom = async (request, response) => {

@@ -67,7 +67,7 @@ io.on('connection', (socket) => {
     socket.on('chatroomMessage', async ({ chatroomId, message }) => {
         if (message.trim().length > 0) {
             if (message[0].includes('/')) {
-                handleCommands(message, socket)
+                handleCommands(chatroomId,message, socket, io)
             } else {
                 handleMessage(chatroomId, message, socket, io)
             }

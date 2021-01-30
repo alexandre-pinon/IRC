@@ -50,7 +50,7 @@ exports.create = async (userId, name) => {
     await chatroom.save()
     const response = {
         chatroom: chatroom,
-        message: 'Chatroom created!'
+        message: `Chatroom ${chatroom.name} created`
     }
 
     return response
@@ -69,7 +69,26 @@ exports.delete = async (name) => {
     await Message.deleteMany({ chatroom: chatroom._id })
     await chatroom.delete()
 
-    return 'Chatroom deleted!'
+    return `Chatroom ${chatroom.name} deleted!`
+}
+
+exports.quit = async (userId, name) => {
+    const user = await User.findOne({ _id: userId })
+    const chatroom = await Chatroom.findOne({ name: name })
+
+    if (!chatroom.users.includes(userId)) {
+        throw `You're not present in ${chatroom.name}!`
+    }
+
+    await chatroom.users.pull(user)
+    await chatroom.save()
+
+    const response = {
+        generalMessage: `User ${user.name} has left ${chatroom.name}!`,
+        message: `You left ${chatroom.name}!`
+    }
+
+    return response
 }
 
 paramIsEmpty = (param) => {
