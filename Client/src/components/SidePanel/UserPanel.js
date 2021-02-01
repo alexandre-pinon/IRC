@@ -25,7 +25,7 @@ class UserPanel extends React.Component {
         {
             key: 'nickname',
             text: <span onClick={this.openModal}>Change Username</span>
-        }
+        },
         {
             key: 'avatar',
             text: <span>Change Avatar</span>

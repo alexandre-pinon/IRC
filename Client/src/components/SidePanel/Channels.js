@@ -1,6 +1,6 @@
 import axios from 'axios'
-import React, { useReducer } from 'react'
-import { Menu, Icon, Modal, Form, Input, Button, Label } from 'semantic-ui-react'
+import React from 'react'
+import { Menu, Icon, Modal, Form, Input, Button } from 'semantic-ui-react'
 import makeToast from '../Toaster'
 
 class Channels extends React.Component {
@@ -111,7 +111,7 @@ class Channels extends React.Component {
                 console.log(error)
             }
         }
-        this.closeModal()
+        this.closeModalAdd()
     }
 
     isFormValid = () => this.state.channelName.trim() ? true : false
@@ -132,19 +132,19 @@ class Channels extends React.Component {
         this.setState({ activeChannel: channel })
     }
 
-    openModalJoin = () => this.setState({ modal: true })
-    openModalAdd = () => this.setState({ modal: true })
+    openModalJoin = () => this.setState({ modalJoin: true })
+    openModalAdd = () => this.setState({ modalAdd: true })
 
     closeModalJoin = () => {
-        this.setState({ modal: false, channelName: '' })
+        this.setState({ modalJoin: false, channelName: '' })
     }
 
     closeModalAdd = () => {
-        this.setState({ modal: false, channelName: '' })
+        this.setState({ modalAdd: false, channelName: '' })
     }
 
     render() {
-        const { channels, modal } = this.state
+        const { channels, modalAdd, modalJoin } = this.state
 
         return (
             <React.Fragment>

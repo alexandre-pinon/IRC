@@ -1,5 +1,5 @@
 import React from 'react'
-import { Header, Segment, Input, Icon, Button, Form, Modal } from 'semantic-ui-react'
+import { Header, Segment, Input, Icon, Button, Form, Modal, Menu } from 'semantic-ui-react'
 
 class MessagesHeader extends React.Component {
 
@@ -16,6 +16,7 @@ class MessagesHeader extends React.Component {
     render() {
 
         const { handleStar, isChannelStarred, activeChannel } = this.props
+        const { modal } = this.state
 
         return (
             <React.Fragment>

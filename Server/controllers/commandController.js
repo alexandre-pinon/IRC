@@ -66,9 +66,9 @@ exports.delete = async (name) => {
     if (!chatroom) {
         throw 'Channels does not exist!'
     }
-    if (chatroom.private) {
-        throw 'Cannot delete private channels!'
-    }
+    // if (chatroom.private) {
+    //     throw 'Cannot delete private channels!'
+    // }
     await Message.deleteMany({ chatroom: chatroom._id })
     await chatroom.delete()
 
@@ -173,21 +173,20 @@ exports.msg = async (userSenderId, userReceiverName, message) => {
 
     const chatroom = await Chatroom
                                 .findOne({
-                                    users: { $all: [sender._id, receiver._id]},
+                                    users: { $all: [sender._id, receiver._id] },
                                     private: true
                                 })
-                                .populate({
-                                    path: 'users',
-                                    model: 'User'
-                                })
-
+                                .populate({ path: 'users', model: 'User' })
+    
+    console.log(chatroom)
     if (!chatroom) {
         const chatroom = new Chatroom({
             name: `${sender.name}&${receiver.name}`,
             users: [sender, receiver],
             private: true
-        })    
+        })  
         await chatroom.save()
+        await Chatroom.populate(chatroom, { path: 'users', model: 'User' })
         return chatroom
     } else {
         return chatroom
