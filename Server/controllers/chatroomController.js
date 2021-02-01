@@ -29,28 +29,27 @@ exports.getChatroomsByString = async (request, response) => {
 }
 
 exports.addUserToChatroom = async (request, response) => {
-    const { chatroomId, userId } = request.body
-    const user = await User.findOne({ _id: userId })
-    const chatroom = await Chatroom.findById(chatroomId)
-
-    if (chatroom.users.includes(userId)) {
-        throw `User already in ${chatroom.name}!`
-    }
-
-    await chatroom.users.push(user)
-    await chatroom.save()
-
-    response.json({
-        message: `User ${user.name} has joined ${chatroom.name}!`
+    const { name, userId } = request.body
+    try {
+        const res = await chatCommand.join(userId, name)
+        response.json({
+            generalMessage: res.generalMessage,
+            message: res.message,
+            chatroom: res.chatroom
     })
+    } catch (error) {
+        throw error
+    }
 }
 
 exports.deleteUserFromChatroom = async (request, response) => {
     const { name, userId } = request.body
     try {
-        const message = await chatCommand.quit(userId, name)
+        const res = await chatCommand.quit(userId, name)
         response.json({
-            message: message
+            generalMessage: res.generalMessage,
+            message: res.message,
+            chatroom: res.chatroom
         })
     } catch (error) {
         throw error

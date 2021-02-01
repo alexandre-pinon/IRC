@@ -56,12 +56,12 @@ io.on('connection', (socket) => {
 
     socket.on('joinRoom', ({ chatroomId }) => {
         socket.join(chatroomId)
-        console.log('A user joined chatroom: ' + chatroomId)
+        console.log(`User ${socket.userId} joined chatroom ${chatroomId}!`)
     })
 
     socket.on('leaveRoom', ({ chatroomId }) => {
         socket.leave(chatroomId)
-        console.log('A user left chatroom: ' + chatroomId)
+        console.log(`User ${socket.userId} left chatroom ${chatroomId}!`)
     })
 
     socket.on('chatroomMessage', async ({ chatroomId, message }) => {

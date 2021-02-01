@@ -72,23 +72,79 @@ exports.delete = async (name) => {
     return `Chatroom ${chatroom.name} deleted!`
 }
 
-exports.quit = async (userId, name) => {
-    const user = await User.findOne({ _id: userId })
+exports.join = async (userId, name) => {
+    if (paramIsEmpty(name)) {
+        throw 'Name field is empty!'
+    }
+
     const chatroom = await Chatroom.findOne({ name: name })
+
+    if (!chatroom) {
+        throw 'Channels does not exist!'
+    }
+
+    if (chatroom.users.includes(userId)) {
+        throw `You're already present in ${chatroom.name}!`
+    }
+
+    const user = await User.findOne({ _id: userId })
+
+    await chatroom.users.push(user)
+    await chatroom.save()
+
+    const response = {
+        generalMessage: `User ${user.name} has joined ${chatroom.name}!`,
+        message: `You joined ${chatroom.name}!`,
+        chatroom: chatroom
+    }
+
+    return response
+}
+
+exports.quit = async (userId, name) => {
+    if (paramIsEmpty(name)) {
+        throw 'Name field is empty!'
+    }
+
+    const chatroom = await Chatroom.findOne({ name: name })
+
+    if (!chatroom) {
+        throw 'Channels does not exist!'
+    }
 
     if (!chatroom.users.includes(userId)) {
         throw `You're not present in ${chatroom.name}!`
     }
+
+    const user = await User.findOne({ _id: userId })
 
     await chatroom.users.pull(user)
     await chatroom.save()
 
     const response = {
         generalMessage: `User ${user.name} has left ${chatroom.name}!`,
-        message: `You left ${chatroom.name}!`
+        message: `You left ${chatroom.name}!`,
+        chatroom: chatroom
     }
 
     return response
+}
+
+exports.users = async (chatroomId) => {
+    const chatroom = await Chatroom.findOne({ _id: chatroomId }).populate({
+        path: 'users',
+        model: 'User'
+    })
+
+    if (!chatroom) {
+        throw 'Channels does not exist!'
+    }
+
+    if (!chatroom.users) {
+        throw 'There are no users in this channel!'
+    }
+
+    return chatroom.users
 }
 
 paramIsEmpty = (param) => {

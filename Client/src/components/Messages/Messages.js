@@ -96,12 +96,10 @@ class Messages extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (this.props.activeChannel &&
-            prevProps.activeChannel !== this.props.activeChannel
-        ) {
+        if (prevProps?.activeChannel?._id !== this.props.activeChannel?._id) {
             this.getMessages()
         }
-        if (prevProps.socket !== this.props.socket) {
+        if (prevProps?.socket !== this.props.socket) {
             this.handleMessages()
         }
         this.scrollToBottom()

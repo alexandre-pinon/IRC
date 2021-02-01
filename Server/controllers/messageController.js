@@ -20,7 +20,6 @@ exports.getMessagesByChatroom = async (request, response) => {
 }
 
 exports.handleCommands = (chatroomId, message, socket, io) => {
-
     let [command, ...argument] = message.split(' ')
     argument = argument.join(' ')
     
@@ -44,14 +43,14 @@ exports.handleCommands = (chatroomId, message, socket, io) => {
         '/list': async () => {
             try {
                 const chatrooms = await chatCommand.list(argument)
-                let response = {
-                    name: 'PlooV4',
-                    userId: socket.userId
-                }
                 const message = chatrooms
                                     .map(chatroom => chatroom.name)
                                     .join(', ')
-                response.message = `Available channels : ${message}`
+                const response = {
+                    name: 'PlooV4',
+                    message: `Available channels : ${message}`,
+                    userId: socket.userId
+                }
                 socket.emit('newMessage', response)
             } catch (error) {
                 const response = {
@@ -93,23 +92,23 @@ exports.handleCommands = (chatroomId, message, socket, io) => {
                 socket.emit('error', response)
             }
         },
-        '/join': () => {
-            console.log('join', argument)
-        },
-        '/quit': async () => {
-            console.log('quit', argument)
+        '/join': async () => {
             try {
-                const response = await chatCommand.quit(
+                const response = await chatCommand.join(
                     socket.userId,
                     argument
                 )
-                io.to(chatroomId).emit('newMessage', {
+                io.to(response.chatroom._id.toString()).emit('newMessage', {
                     message: response.generalMessage,
-                    name: user.name,
+                    name: 'PlooV4',
                     userId: socket.userId
                 })
-                socket.emit('error', response)
+                socket.emit('ok', response)
                 socket.emit('refresh channels')
+                socket.once('channels refreshed', () => {
+                    socket.to(response.chatroom._id.toString()).emit('activate channel', response)
+                    socket.emit('activate channel', response)
+                })
             } catch (error) {
                 const response = {
                     error: error
@@ -117,8 +116,48 @@ exports.handleCommands = (chatroomId, message, socket, io) => {
                 socket.emit('error', response)
             }
         },
-        '/users': () => {
+        '/quit': async () => {
+            try {
+                const response = await chatCommand.quit(
+                    socket.userId,
+                    argument
+                )
+                io.to(response.chatroom._id.toString()).emit('newMessage', {
+                    message: response.generalMessage,
+                    name: 'PlooV4',
+                    userId: socket.userId
+                })
+                socket.emit('ok', response)
+                socket.emit('refresh channels')
+                socket.once('channels refreshed', () => {
+                    socket.to(response.chatroom._id.toString()).emit('activate channel', response)
+                })
+            } catch (error) {
+                const response = {
+                    error: error
+                }
+                socket.emit('error', response)
+            }
+        },
+        '/users': async () => {
             console.log('users', argument)
+            try {
+                const users = await chatCommand.users(chatroomId)
+                const usernames = users
+                                    .map(user => user.name)
+                                    .join(', ')
+                const response = {
+                    name: 'PlooV4',
+                    message: `Users in this channel : ${usernames}`,
+                    userId: socket.userId
+                }
+                socket.emit('newMessage', response)
+            } catch (error) {
+                const response = {
+                    error: error
+                }
+                socket.emit('error', response)
+            }
         },
         '/msg': () => {
             console.log('msg', argument)
