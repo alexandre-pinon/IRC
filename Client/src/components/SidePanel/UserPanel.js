@@ -1,6 +1,6 @@
 import React from 'react'
 import AvatarEditor from 'react-avatar-editor'
-import { Grid, Header, Icon, Dropdown, Image, Modal, Input, Button } from 'semantic-ui-react'
+import { Grid, Header, Icon, Dropdown, Image, Modal, Input, Button, Form } from 'semantic-ui-react'
 import makeToast from '../Toaster'
 
 class UserPanel extends React.Component {
@@ -23,8 +23,12 @@ class UserPanel extends React.Component {
             disabled: true
         },
         {
+            key: 'nickname',
+            text: <span onClick={this.openModal}>Change Username</span>
+        }
+        {
             key: 'avatar',
-            text: <span onClick={this.openModal}>Change Avatar</span>
+            text: <span>Change Avatar</span>
         },
         {
             ket: 'signout',
@@ -97,8 +101,29 @@ class UserPanel extends React.Component {
 
                     {/* Change User Avatar Modal */}
                     <Modal basic open={modal} onClose={this.closeModal}>
-                        <Modal.Header>Change Avatar</Modal.Header>
+                        <Modal.Header>Change Username</Modal.Header>
                         <Modal.Content>
+                            <Form onSubmit={this.handleSubmit}>
+                                <Form.Field>
+                                    <Input
+                                        fluid
+                                        label='New Username'
+                                        //name='newName'
+                                        //onChange={this.handleChange} 
+                                    />
+                                </Form.Field>
+
+                                {/* <Form.Field>
+                                    <Input
+                                        fluid
+                                        label='About the Channel'
+                                        name='channelDetails'
+                                        onChange={this.handleChange} 
+                                    />
+                                </Form.Field> */}
+                            </Form>
+
+                            {/*
                             <Input
                                 onChange={this.handleChange}
                                 fluid
@@ -132,9 +157,19 @@ class UserPanel extends React.Component {
                                     </Grid.Column>
                                 </Grid.Row>
                             </Grid>
+                                        */}
                         </Modal.Content>
                         <Modal.Actions>
 
+                            <Button color='green' inverted onClick={this.handleSubmit}>
+                            <Icon name='checkmark' /> Change Username
+                            </Button>
+
+                            <Button color='red' inverted onClick={this.closeModal}>
+                                <Icon name='remove' /> Cancel
+                            </Button>
+
+                            {/*
                             {croppedImage && <Button color='green' inverted>
                                 <Icon name='save' /> Change Avatar
                             </Button>}
@@ -146,6 +181,8 @@ class UserPanel extends React.Component {
                             <Button color='red' inverted onClick={this.closeModal}>
                                 <Icon name='remove' /> Cancel
                             </Button>
+                            */}
+
                         </Modal.Actions>
                     </Modal>
                 </Grid.Column>
