@@ -80,3 +80,15 @@ exports.deleteChatroom = async (request, response) => {
         throw error
     }
 }
+
+exports.getUsers = async (request, response) => {
+    const chatroomId = request.body.chatroomId
+    try {
+        const users = await chatCommand.users(chatroomId)
+        response.json({
+            users: users
+        })
+    } catch (error) {
+        throw error
+    }
+}

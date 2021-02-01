@@ -147,6 +147,37 @@ exports.users = async (chatroomId) => {
     return chatroom.users
 }
 
+exports.msg = async (userSenderId, userReceiverName, message) => {
+    console.log({userSenderId, userReceiverName, message})
+    if (paramIsEmpty(userReceiverName)) {
+        throw 'No user precised!'
+    }
+    if (paramIsEmpty(message)) {
+        throw 'Message is empty!'
+    }
+
+    const sender = await User.findOne({ _id: userSenderId })
+    const receiver = await User.findOne({ name: userReceiverName })
+
+    if (!receiver) {
+        throw 'User does not exist!'
+    }
+
+    const chatroom = await Chatroom.findOne({ users: [sender._id, receiver._id], private: true })
+
+    if (!chatroom) {
+        const chatroom = new Chatroom({
+            name: `${sender.name} & ${receiver.name}`,
+            users: [sender, receiver],
+            private: true
+        })    
+        await chatroom.save()
+        return chatroom
+    } else {
+        return chatroom
+    }
+}
+
 paramIsEmpty = (param) => {
     return !param || !param.trim()
 }

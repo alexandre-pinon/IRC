@@ -140,7 +140,6 @@ exports.handleCommands = (chatroomId, message, socket, io) => {
             }
         },
         '/users': async () => {
-            console.log('users', argument)
             try {
                 const users = await chatCommand.users(chatroomId)
                 const usernames = users
@@ -159,8 +158,30 @@ exports.handleCommands = (chatroomId, message, socket, io) => {
                 socket.emit('error', response)
             }
         },
-        '/msg': () => {
+        '/msg': async () => {
             console.log('msg', argument)
+            try {
+                let [userSenderName, ...message] = argument.split(' ')
+                message = message.join(' ')
+
+                const chatroom = await chatCommand.msg(socket.userId, userSenderName, message)
+                this.handleMessage(chatroom._id, message, socket, io)
+
+                const response = {
+                    chatroom: chatroom
+                }
+
+                socket.emit('refresh channels')
+                socket.once('channels refreshed', () => {
+                    socket.emit('activate channel', response)
+                })
+            } catch (error) {
+                const response = {
+                    error: error
+                }
+                console.log(response)
+                socket.emit('error', response)
+            }
         },
         'default': () => {
             console.log('default', argument)

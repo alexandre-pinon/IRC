@@ -26,6 +26,7 @@ class Channels extends React.Component {
                     channels: response.data,
                 }, () => {
                     const { channels, activeChannel} = this.state
+                    this.props.callBackHandleChannels(channels)
                     const wrongActiveChannel = !channels.some(
                             channel => channel?.name === activeChannel?.name
                     )
@@ -155,15 +156,20 @@ class Channels extends React.Component {
                 {/* this.displayChannels(channels) */}
 
                 {/* Example Channel 1 */}
-                { channels ? channels.map(channel => (
-                <Menu.Item
-                    key={channel._id}
-                    onClick={() => this.activateChannel(channel)}
-                    style={{ opacity: 1.0 }}
-                >
-                    {channel.name}
-                </Menu.Item>
-                )) : ''}
+                { channels ? channels.map(channel => {
+                    if (!channel.private) {
+                        return (
+                            <Menu.Item
+                                key={channel._id}
+                                onClick={() => this.activateChannel(channel)}
+                                style={{ opacity: 1.0 }}
+                            >
+                                {channel.name}
+                            </Menu.Item>
+                        )
+                    }
+                    return ''
+                }) : ''}
             </Menu.Menu>
 
             {/* Add Channel Modal */}

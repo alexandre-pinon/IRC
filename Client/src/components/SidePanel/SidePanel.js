@@ -6,6 +6,21 @@ import Starred from './Starred'
 import { Menu } from 'semantic-ui-react'
 
 class SidePanel extends React.Component {
+    constructor(props) {
+        super(props)
+        this.channelsComponent = React.createRef()
+    }
+    state = {
+        channels: [],
+    }
+
+    handleChannels = (channels) => {
+        this.setState({channels: channels})
+    }
+    handleActivateChannel = (channel) => {
+        this.channelsComponent.current.activateChannel(channel)
+    }
+
     render() {
         return (
             <Menu
@@ -22,12 +37,15 @@ class SidePanel extends React.Component {
                 />
                 <Starred />
                 <Channels
-                    callBackActivateChannel = {
-                        this.props.callBackActivateChannel
-                    }
+                    callBackActivateChannel = {this.props.callBackActivateChannel}
+                    callBackHandleChannels = {this.handleChannels}
                     socket={this.props.socket}
+                    ref={this.channelsComponent}
                 />
-                <DirectMessages />
+                <DirectMessages 
+                    channels={this.state.channels}
+                    callBackActivateChannel = {this.handleActivateChannel}
+                />
             </Menu>
         )
     }

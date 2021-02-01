@@ -17,22 +17,27 @@ class DirectMessages extends React.Component {
                     {/* Users to Send Direct Messages */}
 
                     
-                    {/*users.map(user => (
-                        <Menu.Item
-                            key={user.uid}
-                            onClick={() => console.log(user)}
-                            style={{ opacity: 0.7, fontStyle: 'italic' }}
-                        >
-                            <Icon
-                                name='circle'
-                                color={this.isUserOnline(user) ? 'green' : 'red'}
-                            />
-                            @ {user.name}
-                        </Menu.Item>
-                    ))*/}
+                    { this.props.channels ? this.props.channels.map(channel => {
+                        if (channel.private) {
+                            return (
+                                <Menu.Item
+                                    key={channel._id}
+                                    onClick={() => this.props.callBackActivateChannel(channel)}
+                                    style={{ opacity: 1.0, fontStyle: 'italic' }}
+                                >
+                                    <Icon
+                                        name='circle'
+                                        color={'green'}
+                                    />
+                                    @ {channel.name}
+                                </Menu.Item>
+                            )
+                        }
+                        return ''
+                    }) : ''}
 
 
-                    <Menu.Item
+                    {/* <Menu.Item
                         style={{ opacity: 1.0, fontStyle: 'italic' }}
                     >
                         <Icon
@@ -70,7 +75,7 @@ class DirectMessages extends React.Component {
                             color={'green'}
                         />
                         @ {'UmaSimp'}
-                    </Menu.Item>
+                    </Menu.Item> */}
                     
                 </Menu.Menu>
             </React.Fragment>
