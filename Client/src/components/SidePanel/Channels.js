@@ -8,7 +8,8 @@ class Channels extends React.Component {
         channels: [],
         channelName: '',
         activeChannel: null,
-        modal: false
+        modalJoin: false,
+        modalAdd: false
     }
 
     getUserChannels = async () => {
@@ -131,12 +132,16 @@ class Channels extends React.Component {
         this.setState({ activeChannel: channel })
     }
 
-    openModal = () => this.setState({ modal: true })
+    openModalJoin = () => this.setState({ modal: true })
+    openModalAdd = () => this.setState({ modal: true })
 
-    closeModal = () => {
+    closeModalJoin = () => {
         this.setState({ modal: false, channelName: '' })
     }
 
+    closeModalAdd = () => {
+        this.setState({ modal: false, channelName: '' })
+    }
 
     render() {
         const { channels, modal } = this.state
@@ -155,8 +160,8 @@ class Channels extends React.Component {
                             }, 0)
                             : 0
                     })
-                    <Icon name='add' onClick={this.openModal} />
-                    <Icon name='arrow alternate circle right outline' />
+                    <Icon name='add' onClick={this.openModalAdd} />
+                    <Icon name='arrow alternate circle right outline' onClick={this.openModalJoin} />
                 </Menu.Item>
                 {/* Channels */}
                 {/* this.displayChannels(channels) */}
@@ -179,7 +184,7 @@ class Channels extends React.Component {
             </Menu.Menu>
 
             {/* Add Channel Modal */}
-            <Modal basic open={modal} onClose={this.closeModal}>
+            <Modal basic open={modalAdd} onClose={this.closeModalAdd}>
                 <Modal.Header>Add a Channel</Modal.Header>
                 <Modal.Content>
                     <Form onSubmit={this.handleSubmit}>
@@ -211,12 +216,51 @@ class Channels extends React.Component {
                         <Icon name='checkmark' /> Add
                     </Button>
 
-                    <Button color='red' inverted onClick={this.closeModal}>
+                    <Button color='red' inverted onClick={this.closeModalAdd}>
                         <Icon name='remove' /> Cancel
                     </Button>
 
                 </Modal.Actions>
             </Modal>
+
+            <Modal open={modalJoin} onClose={this.closeModalJoin}>
+                <Modal.Header>Join a Channel</Modal.Header>
+                <Modal.Content>
+                    {/*
+                    <Form onSubmit={this.handleSubmit}>
+                        <Form.Field>
+                            <Input
+                                fluid
+                                label='Name of Channel'
+                                name='channelName'
+                                onChange={this.handleChange} 
+                            />
+                        </Form.Field>
+
+                        {/* <Form.Field>
+                            <Input
+                                fluid
+                                label='About the Channel'
+                                name='channelDetails'
+                                onChange={this.handleChange} 
+                            />
+                        </Form.Field> 
+                        </Form> */}
+                </Modal.Content>
+
+                <Modal.Actions>
+
+                    <Button color='green' inverted onClick={this.handleSubmit}>
+                        <Icon name='checkmark' /> Join
+                    </Button>
+
+                    <Button color='red' inverted onClick={this.closeModalJoin}>
+                        <Icon name='remove' /> Cancel
+                    </Button>
+
+                </Modal.Actions>
+            </Modal>
+
             </React.Fragment>
     
         )
