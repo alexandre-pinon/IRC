@@ -1,10 +1,11 @@
 import React from 'react'
-import { useParams } from 'react-router-dom'
 import { Menu, Icon } from 'semantic-ui-react'
 
 class DirectMessages extends React.Component {
     
     render() {
+
+        const { channels, username } = this.props
 
         return (
             <React.Fragment>
@@ -13,11 +14,18 @@ class DirectMessages extends React.Component {
                         <span>
                             <Icon name='mail' /> DIRECT MESSAGES
                         </span> {' '}
+                        ({
+                            channels
+                                ? channels.reduce((acc, channel) => { 
+                                        return acc + (channel.private ? 1 : 0)
+                                }, 0)
+                                : 0
+                        })
                     </Menu.Item>
                     {/* Users to Send Direct Messages */}
 
                     
-                    { this.props.channels ? this.props.channels.map(channel => {
+                    { channels ? channels.map(channel => {
                         if (channel.private) {
                             return (
                                 <Menu.Item
@@ -29,7 +37,11 @@ class DirectMessages extends React.Component {
                                         name='circle'
                                         color={'green'}
                                     />
-                                    @ {channel.name}
+                                    @ {
+                                        channel.users[0].name !== username 
+                                            ? channel.users[0].name
+                                            : channel.users[1].name
+                                    }
                                 </Menu.Item>
                             )
                         }
@@ -37,45 +49,13 @@ class DirectMessages extends React.Component {
                     }) : ''}
 
 
-                    {/* <Menu.Item
-                        style={{ opacity: 1.0, fontStyle: 'italic' }}
-                    >
-                        <Icon
-                            name='circle'
-                            color={'red'}
-                        />
-                        @ {'Keisay'}
-                    </Menu.Item>
-                    
-                    <Menu.Item
-                        style={{ opacity: 1.0, fontStyle: 'italic' }}
-                    >
-                        <Icon
-                            name='circle'
-                            color={'green'}
-                        />
-                        @ {'Wilfrère'}
-                    </Menu.Item>
-
-                    <Menu.Item
-                        style={{ opacity: 1.0, fontStyle: 'italic' }}
-                    >
-                        <Icon
-                            name='circle'
-                            color={'red'}
-                        />
-                        @ {'BryanCurry'}
-                    </Menu.Item>
-
-                    <Menu.Item
-                        style={{ opacity: 1.0, fontStyle: 'italic' }}
-                    >
-                        <Icon
-                            name='circle'
-                            color={'green'}
-                        />
-                        @ {'UmaSimp'}
-                    </Menu.Item> */}
+                    {/* activeChannel 
+                            ? activeChannel.private
+                                ? activeChannel.users[0].name !== this.props.username
+                                    ? activeChannel.users[0].name
+                                    : activeChannel.users[1].name
+                                : activeChannel.name
+                            : 'No channel active' */}
                     
                 </Menu.Menu>
             </React.Fragment>

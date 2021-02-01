@@ -148,7 +148,13 @@ class Channels extends React.Component {
                     <span>
                         <Icon name='exchange' /> CHANNELS
                     </span> {' '}
-                    ({ channels ? channels.length : 0 })
+                    ({
+                        channels
+                            ? channels.reduce((acc, channel) => { 
+                                    return acc + (channel.private ? 0 : 1)
+                            }, 0)
+                            : 0
+                    })
                     <Icon name='add' onClick={this.openModal} />
                     <Icon name='arrow alternate circle right outline' />
                 </Menu.Item>

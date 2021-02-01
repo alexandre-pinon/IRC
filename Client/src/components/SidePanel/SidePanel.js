@@ -45,6 +45,7 @@ class SidePanel extends React.Component {
                 <DirectMessages 
                     channels={this.state.channels}
                     callBackActivateChannel = {this.handleActivateChannel}
+                    username={this.props.username}
                 />
             </Menu>
         )

@@ -14,7 +14,10 @@ exports.getAllChatrooms = async (request, response) => {
 
 exports.getChatroomsByUser = async (request, response) => {
     const userId = request.params.userId
-    const chatrooms = await Chatroom.find({ 'users': userId })
+    const chatrooms = await Chatroom.find({ 'users': userId }).populate({
+        path: 'users',
+        model: 'User'
+    })
 
     response.json(chatrooms)
 }

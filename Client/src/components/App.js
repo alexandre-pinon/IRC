@@ -71,6 +71,7 @@ const App = (props) => {
           callBackSetUsername = {handleSetUsername}
           socket = {socket}
           activeChannel = {activeChannel}
+          username={username}
         />
       </Grid.Column>
 

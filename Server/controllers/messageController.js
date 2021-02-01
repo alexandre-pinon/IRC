@@ -159,13 +159,12 @@ exports.handleCommands = (chatroomId, message, socket, io) => {
             }
         },
         '/msg': async () => {
-            console.log('msg', argument)
             try {
                 let [userSenderName, ...message] = argument.split(' ')
                 message = message.join(' ')
 
                 const chatroom = await chatCommand.msg(socket.userId, userSenderName, message)
-                this.handleMessage(chatroom._id, message, socket, io)
+                this.handleMessage(chatroom._id.toString(), message, socket, io)
 
                 const response = {
                     chatroom: chatroom
@@ -179,12 +178,10 @@ exports.handleCommands = (chatroomId, message, socket, io) => {
                 const response = {
                     error: error
                 }
-                console.log(response)
                 socket.emit('error', response)
             }
         },
         'default': () => {
-            console.log('default', argument)
             const response = {
                 error: 'Unknown command!'
             }

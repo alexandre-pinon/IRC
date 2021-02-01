@@ -10,7 +10,14 @@ class MessagesHeader extends React.Component {
             <Segment clearing>
                 <Header fluid='true' as='h2' floated='left' style={{ marginBottom: 0 }}>
                     <span>
-                        {activeChannel?.name}
+                        {activeChannel 
+                            ? activeChannel.private
+                                ? activeChannel.users[0].name !== this.props.username
+                                    ? activeChannel.users[0].name
+                                    : activeChannel.users[1].name
+                                : activeChannel.name
+                            : 'No channel active'
+                        }
                         <Icon 
                             onClick={handleStar}
                             name={isChannelStarred ? 'star' : 'star outline'} 

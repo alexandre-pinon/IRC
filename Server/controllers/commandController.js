@@ -15,7 +15,7 @@ exports.nick = async (userId, newName) => {
 
 exports.list = async (string) => {
     const regex = new RegExp(string, 'i')
-    const chatrooms = await Chatroom.find({ 'name': regex })
+    const chatrooms = await Chatroom.find({ name: regex, private: false })
     if (!chatrooms.length) {
         throw 'No channels found!'
     }
@@ -66,6 +66,9 @@ exports.delete = async (name) => {
     if (!chatroom) {
         throw 'Channels does not exist!'
     }
+    if (chatroom.private) {
+        throw 'Cannot delete private channels!'
+    }
     await Message.deleteMany({ chatroom: chatroom._id })
     await chatroom.delete()
 
@@ -81,6 +84,9 @@ exports.join = async (userId, name) => {
 
     if (!chatroom) {
         throw 'Channels does not exist!'
+    }
+    if (chatroom.private) {
+        throw 'Cannot join private channels!'
     }
 
     if (chatroom.users.includes(userId)) {
@@ -110,6 +116,9 @@ exports.quit = async (userId, name) => {
 
     if (!chatroom) {
         throw 'Channels does not exist!'
+    }
+    if (chatroom.private) {
+        throw 'Cannot quit private channels!'
     }
 
     if (!chatroom.users.includes(userId)) {
@@ -148,7 +157,6 @@ exports.users = async (chatroomId) => {
 }
 
 exports.msg = async (userSenderId, userReceiverName, message) => {
-    console.log({userSenderId, userReceiverName, message})
     if (paramIsEmpty(userReceiverName)) {
         throw 'No user precised!'
     }
@@ -163,11 +171,19 @@ exports.msg = async (userSenderId, userReceiverName, message) => {
         throw 'User does not exist!'
     }
 
-    const chatroom = await Chatroom.findOne({ users: [sender._id, receiver._id], private: true })
+    const chatroom = await Chatroom
+                                .findOne({
+                                    users: { $all: [sender._id, receiver._id]},
+                                    private: true
+                                })
+                                .populate({
+                                    path: 'users',
+                                    model: 'User'
+                                })
 
     if (!chatroom) {
         const chatroom = new Chatroom({
-            name: `${sender.name} & ${receiver.name}`,
+            name: `${sender.name}&${receiver.name}`,
             users: [sender, receiver],
             private: true
         })    

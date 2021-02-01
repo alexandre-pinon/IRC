@@ -128,6 +128,7 @@ class Messages extends React.Component {
                     handleStar={this.handleStar}
                     isChannelStarred={isChannelStarred}
                     activeChannel = {this.props.activeChannel}
+                    username={this.props.username}
                 />
                 
                 <Segment>
