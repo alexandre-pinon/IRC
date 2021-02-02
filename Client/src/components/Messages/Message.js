@@ -1,5 +1,6 @@
 import React from 'react'
 import { Comment, Image } from 'semantic-ui-react'
+import defaultProfilePic from '../../ressources/default-profile-picture.jpg'
 
 /*
 const isOwnMessage = (message, user) => {
@@ -14,7 +15,7 @@ const timeFromNow = timestamp => moment(timestamp).fromNow()
 
 const Message = ({ message, username }) => (
     <Comment>
-        <Comment.Avatar src={'https://avatarfiles.alphacoders.com/259/thumb-1920-259754.png'} />
+        <Comment.Avatar src={defaultProfilePic} />
         <Comment.Content className='message__self'>
             <Comment.Author as='a'>{username}</Comment.Author>
             <Comment.Text>{message}</Comment.Text>

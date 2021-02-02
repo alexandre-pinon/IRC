@@ -1,16 +1,75 @@
+import axios from 'axios'
 import React from 'react'
 import { Header, Segment, Input, Icon, Button, Form, Modal, Menu } from 'semantic-ui-react'
+import { makeConfirm, makeToast } from '../Toaster'
+
 
 class MessagesHeader extends React.Component {
 
     state = {
-        modal: false
+        modal: false,
+        newChannelName: ''
     }
 
     openModal = () => this.setState({ modal: true })
 
     closeModal = () => {
-        this.setState({ modal: false })
+        this.setState({ modal: false, newChannelName: '' })
+    }
+
+    handleSubmit = event => {
+        event.preventDefault()
+        this.editChannelName()
+    }
+
+    handleChange = event => {
+        this.setState({ [event.target.name]: event.target.value })
+    }
+
+    editChannelName = async () => {
+        try {
+            const data = {
+                chatroomId: this.props.activeChannel._id,
+                newName: this.state.newChannelName,
+            }
+            const headers = {
+                Authorization:
+                    'Bearer ' +
+                    sessionStorage.getItem('CC_Token')
+            }
+            const response = await axios.put(
+                'http://localhost:8000/chatroom/edit',
+                data,
+                { headers: headers }
+            )
+            this.props.socket.emit('refreshChannels')
+            makeToast('success', response.data.message)
+        } catch (error) {
+            if (error.response?.data?.message) {
+                makeToast('error', error.response.data.message)
+            }
+        }
+        this.closeModal()
+    }
+
+    quit = async () => {
+        const confirm = await makeConfirm('warning', `Are you sure to leave ${this.props.activeChannel.name} ?`)
+        if (confirm && this.props.socket) {
+            this.props.socket.emit('chatroomMessage', {
+                chatroomId: this.props.activeChannel._id,
+                message: `/quit ${this.props.activeChannel.name}`
+            })
+        }
+    }
+
+    delete = async () => {
+        const confirm = await makeConfirm('warning', `Are you sure to DELETE ${this.props.activeChannel.name} ?`)
+        if (confirm && this.props.socket) {
+            this.props.socket.emit('chatroomMessage', {
+                chatroomId: this.props.activeChannel._id,
+                message: `/delete ${this.props.activeChannel.name}`
+            })
+        }
     }
 
     render() {
@@ -47,17 +106,15 @@ class MessagesHeader extends React.Component {
                 </Header>
 
                 {/* Channel Search Input */}
-                <Header floated='right'>
+                {/* <Header floated='right'>
                         <Icon
                             name='edit outline'
                             onClick={this.openModal}
                             color='violet' />
-                        <div></div>
                         <Icon
                             //onClick={...}
                             name='sign-out'
                             color='violet' />
-                        <div></div>
                         <Icon
                             name='trash alternate outline'
                             color='violet' />
@@ -68,7 +125,27 @@ class MessagesHeader extends React.Component {
                             name='searchTerm'
                             placeholder='Search Messages'
                         />
-                        */}
+                        
+                </Header> */}
+                <Header floated='right'>
+                    <Icon
+                        name='trash alternate outline'
+                        onClick={this.delete}
+                        color='red'
+                    />
+                </Header>
+                <Header floated='right'>
+                    <Icon
+                        name='big sign-out'
+                        onClick={this.quit}
+                        color='violet' />
+                </Header>
+                <Header floated='right'>
+                    <Icon
+                        name='edit outline'
+                        onClick={this.openModal}
+                        color='violet'
+                    />
                 </Header>
             </Segment>
 
@@ -80,8 +157,8 @@ class MessagesHeader extends React.Component {
                             <Input
                                 fluid
                                 label='New Name'
-                                //name='channelName'
-                                //onChange={this.handleChange} 
+                                name='newChannelName'
+                                onChange={this.handleChange} 
                             />
                         </Form.Field>
 

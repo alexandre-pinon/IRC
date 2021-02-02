@@ -5,7 +5,7 @@ import Message from './Message'
 import Typing from './Typing'
 import { Segment, Comment } from 'semantic-ui-react'
 import axios from 'axios'
-import makeToast from '../Toaster'
+import { makeToast } from '../Toaster'
 
 class Messages extends React.Component {
 
@@ -34,6 +34,7 @@ class Messages extends React.Component {
             this.props.socket.on('nick', (response) => {
                 this.setUsername(response.newName)
                 sessionStorage.setItem('username', response.newName)
+                this.props.socket.emit('refreshChannels')
                 this.getMessages()
             })
         }
@@ -64,7 +65,6 @@ class Messages extends React.Component {
             )
             this.setState({ deleteMessages: response.data })
         } catch (error) {
-            // setTimeout(this.getChannels, 3000)
             console.log('Error retrieving Messages!', error)
         }
     }
@@ -86,7 +86,6 @@ class Messages extends React.Component {
             )
             this.setState({ messages: response.data })
         } catch (error) {
-            // setTimeout(this.getChannels, 3000)
             console.log('Error retrieving Messages!', error)
         }
     }
@@ -129,6 +128,7 @@ class Messages extends React.Component {
                     isChannelStarred={isChannelStarred}
                     activeChannel = {this.props.activeChannel}
                     username={this.props.username}
+                    socket = {this.props.socket}
                 />
                 
                 <Segment>

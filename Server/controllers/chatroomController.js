@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { request, response } = require('../app')
 const chatCommand = require('./commandController')
 const Chatroom = mongoose.model('Chatroom')
 const User = mongoose.model('User')
@@ -94,4 +95,32 @@ exports.getUsers = async (request, response) => {
     } catch (error) {
         throw error
     }
+}
+
+exports.editChatroom = async (request, response) => {
+    const { chatroomId, newName } = request.body
+    if (paramIsEmpty(newName)) {
+        throw 'Name field is empty!'
+    }
+
+    const chatroomExists = await Chatroom.findOne({ name: newName })
+    if (chatroomExists) {
+        throw 'Chatroom with that name already exists!'
+    }
+
+    const chatroom = await Chatroom.findOne({ _id: chatroomId })
+    if(chatroom.private) {
+        throw 'Cannot edit private channel!'
+    }
+
+    chatroom.name = newName
+    chatroom.save()
+
+    response.json({
+        message: `Successfully changed channel name to ${newName}!`
+    })  
+}
+
+paramIsEmpty = (param) => {
+    return !param || !param.trim()
 }

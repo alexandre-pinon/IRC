@@ -6,7 +6,7 @@ import ColorPanel from './ColorPanel/ColorPanel'
 import SidePanel from './SidePanel/SidePanel'
 import Messages from './Messages/Messages'
 import MetaPanel from './MetaPanel/MetaPanel'
-import makeToast from './Toaster'
+import { makeToast } from './Toaster'
 import io from 'socket.io-client'
 
 const App = (props) => {
@@ -24,7 +24,6 @@ const App = (props) => {
       })
     
       newSocket.on('disconnect', () => {
-        // setTimeout(setupSocket, 50000)
         makeToast('error', 'Socket Disconnected!')
         setSocket(null)
       })
@@ -63,6 +62,7 @@ const App = (props) => {
         callBackActivateChannel = {handleActivateChannel}
         socket={socket}
         username={username}
+        activeChannel = {activeChannel}
       />
 
       <Grid.Column style = {{ marginLeft: 320 }}>

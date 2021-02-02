@@ -1,19 +1,33 @@
 import React from 'react'
 import AvatarEditor from 'react-avatar-editor'
 import { Grid, Header, Icon, Dropdown, Image, Modal, Input, Button, Form } from 'semantic-ui-react'
-import makeToast from '../Toaster'
+import { makeToast } from '../Toaster'
+import defaultProfilePic from '../../ressources/default-profile-picture.jpg'
 
 class UserPanel extends React.Component {
     state = {
         modal: false,
         previewImage: '',
         croppedImage: '',
-        blob: ''
+        blob: '',
+        newUsername: '',
+    }
+
+    changeUsername = () => {
+        if (this.props.socket) {
+            this.props.socket.emit('chatroomMessage', {
+                chatroomId: this.props.activeChannel._id,
+                message: `/nick ${this.state.newUsername}`
+            })
+            this.closeModal()
+        } else {
+            console.log('Error : NO SOCKET!')
+        }
     }
 
     openModal = () => this.setState({ modal: true })
 
-    closeModal = () => this.setState({ modal: false })
+    closeModal = () => this.setState({ modal: false, newUsername: '' })
 
 
     dropdownOptions = () => [
@@ -60,8 +74,16 @@ class UserPanel extends React.Component {
         }
     }
 
+    handleSubmit = event => {
+        event.preventDefault()
+        this.changeUsername()
+    }
+
+    handleChange = event => {
+        this.setState({ [event.target.name]: event.target.value })
+    }
+
     handleSignout = () => {
-        // Function to sign out of the App
         this.props.socket?.disconnect()
         makeToast('error', 'Socket Disconnected!')
         sessionStorage.removeItem('CC_Token')
@@ -92,7 +114,8 @@ class UserPanel extends React.Component {
                         <Dropdown 
                         trigger={
                             <span>
-                                <Image src={'https://avatarfiles.alphacoders.com/259/thumb-1920-259754.png'} spaced='right' avatar />
+                                <Image src={defaultProfilePic} spaced='right' avatar />
+                                {/* <Image src={'https://avatarfiles.alphacoders.com/259/thumb-1920-259754.png'} spaced='right' avatar /> */}
                                 {this.props.username}
                             </span>
                         } options={this.dropdownOptions()} />
@@ -108,8 +131,8 @@ class UserPanel extends React.Component {
                                     <Input
                                         fluid
                                         label='New Username'
-                                        //name='newName'
-                                        //onChange={this.handleChange} 
+                                        name='newUsername'
+                                        onChange={this.handleChange} 
                                     />
                                 </Form.Field>
 

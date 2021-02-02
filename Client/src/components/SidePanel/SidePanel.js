@@ -34,6 +34,7 @@ class SidePanel extends React.Component {
                     history={this.props.history}
                     socket={this.props.socket}
                     username={this.props.username}
+                    activeChannel = {this.props.activeChannel}
                 />
                 <Starred />
                 <Channels

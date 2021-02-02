@@ -1,7 +1,7 @@
 import axios from 'axios'
 import React from 'react'
 import { Menu, Icon, Modal, Form, Input, Button } from 'semantic-ui-react'
-import makeToast from '../Toaster'
+import { makeToast } from '../Toaster'
 
 class Channels extends React.Component {
     state = {
@@ -38,7 +38,6 @@ class Channels extends React.Component {
                 })
             }
         } catch (error) {
-            // setTimeout(this.getUserChannels, 3000)
             console.log('Error retrieving Channels!', error)
         }
     }
@@ -86,41 +85,23 @@ class Channels extends React.Component {
         }
     }
 
-    addChannel = async () => {
-        try {
-            const token = sessionStorage.getItem('CC_Token')
-            const payload = token ? JSON.parse(atob(token.split('.')[1])) : null
-            const data = {
-                name: this.state.channelName,
-                userId: payload.id
-            }
-            const headers = { Authorization: `Bearer ${token}` }
-            const response = await axios.post(
-                'http://localhost:8000/chatroom/create',
-                data,
-                { headers: headers }
-            )
-            makeToast('success', response.data.message)
-            await this.getUserChannels()
-            this.activateChannel(response.data.chatroom)
-        } catch (error) {
-            if (error.response?.data?.message) {
-                makeToast('error', error.response.data.message)
-            } else {
-                makeToast('error', 'Internal Server Error')
-                console.log(error)
-            }
+    addChannel = () => {
+        if (this.props.socket) {
+            this.props.socket.emit('chatroomMessage', {
+                chatroomId: this.state.activeChannel._id,
+                message: `/create ${this.state.channelName}`
+            })
+            this.closeModalAdd()
+        } else {
+            console.log('Error : NO SOCKET!')
         }
-        this.closeModalAdd()
     }
 
     isFormValid = () => this.state.channelName.trim() ? true : false
 
     handleSubmit = event => {
         event.preventDefault()
-        this.isFormValid()
-            ? this.addChannel()
-            : makeToast('error', 'Channel name is empty!')
+        this.addChannel()
     }
 
     handleChange = event => {

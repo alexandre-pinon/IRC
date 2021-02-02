@@ -74,4 +74,8 @@ io.on('connection', (socket) => {
             }
         }
     })
+
+    socket.on('refreshChannels', async () => {
+        socket.emit('refresh channels')
+    })
 })

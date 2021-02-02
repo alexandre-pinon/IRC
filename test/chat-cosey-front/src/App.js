@@ -6,7 +6,7 @@ import RegisterPage from './Pages/RegisterPage'
 import DashboardPage from './Pages/DashBoard'
 import IndexPage from './Pages/IndexPage'
 import ChatroomPage from './Pages/ChatroomPage'
-import makeToast from './Toaster'
+import { makeToast } from './Toaster'
 
 function App() {
   const [socket, setSocket] = React.useState(null)

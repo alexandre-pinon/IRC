@@ -12,6 +12,10 @@ const Toast = Swal.mixin({
     }
 })
 
+const Confirm = Swal.mixin({
+    showCancelButton: true,
+})
+
 const makeToast = (type, message) => {
     Toast.fire({
         icon: type,
@@ -19,4 +23,15 @@ const makeToast = (type, message) => {
     })
 }
 
-export default makeToast
+const makeConfirm = async (type, message) => {
+    const choice = await Confirm.fire({
+        icon: type,
+        title: message
+    })
+    return choice.value
+}
+
+export {
+    makeToast,
+    makeConfirm
+}

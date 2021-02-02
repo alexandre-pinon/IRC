@@ -66,9 +66,9 @@ exports.delete = async (name) => {
     if (!chatroom) {
         throw 'Channels does not exist!'
     }
-    // if (chatroom.private) {
-    //     throw 'Cannot delete private channels!'
-    // }
+    if (chatroom.private) {
+        throw 'Cannot delete private channels!'
+    }
     await Message.deleteMany({ chatroom: chatroom._id })
     await chatroom.delete()
 
