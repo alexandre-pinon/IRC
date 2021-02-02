@@ -48,7 +48,6 @@ class MessagesHeader extends React.Component {
 
                 {/* Channel Search Input */}
                 <Header floated='right'>
-                    <Menu.Item>
                         <Icon
                             name='edit outline'
                             onClick={this.openModal}
@@ -70,7 +69,6 @@ class MessagesHeader extends React.Component {
                             placeholder='Search Messages'
                         />
                         */}
-                    </Menu.Item>
                 </Header>
             </Segment>
 
