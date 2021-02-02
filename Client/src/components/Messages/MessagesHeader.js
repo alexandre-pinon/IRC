@@ -32,11 +32,7 @@ class MessagesHeader extends React.Component {
                 chatroomId: this.props.activeChannel._id,
                 newName: this.state.newChannelName,
             }
-            const headers = {
-                Authorization:
-                    'Bearer ' +
-                    sessionStorage.getItem('CC_Token')
-            }
+            const headers = { Authorization: 'Bearer ' + sessionStorage.getItem('CC_Token') }
             const response = await axios.put(
                 'http://localhost:8000/chatroom/edit',
                 data,
@@ -53,21 +49,23 @@ class MessagesHeader extends React.Component {
     }
 
     quit = async () => {
-        const confirm = await makeConfirm('warning', `Are you sure to leave ${this.props.activeChannel.name} ?`)
-        if (confirm && this.props.socket) {
-            this.props.socket.emit('chatroomMessage', {
-                chatroomId: this.props.activeChannel._id,
-                message: `/quit ${this.props.activeChannel.name}`
+        const { socket, activeChannel } = this.props
+        const confirm = await makeConfirm('warning', `Are you sure to leave ${activeChannel.name} ?`)
+        if (confirm && socket) {
+            socket.emit('chatroomMessage', {
+                chatroomId: activeChannel._id,
+                message: `/quit ${activeChannel.name}`
             })
         }
     }
 
     delete = async () => {
-        const confirm = await makeConfirm('warning', `Are you sure to DELETE ${this.props.activeChannel.name} ?`)
-        if (confirm && this.props.socket) {
-            this.props.socket.emit('chatroomMessage', {
-                chatroomId: this.props.activeChannel._id,
-                message: `/delete ${this.props.activeChannel.name}`
+        const { socket, activeChannel } = this.props
+        const confirm = await makeConfirm('warning', `Are you sure to DELETE ${activeChannel.name} ?`)
+        if (confirm && socket) {
+            socket.emit('chatroomMessage', {
+                chatroomId: activeChannel._id,
+                message: `/delete ${activeChannel.name}`
             })
         }
     }

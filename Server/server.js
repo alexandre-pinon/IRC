@@ -64,7 +64,7 @@ io.on('connection', (socket) => {
         console.log(`User ${socket.userId} left chatroom ${chatroomId}!`)
     })
 
-    socket.on('chatroomMessage', async ({ chatroomId, message }) => {
+    socket.on('chatroomMessage', ({ chatroomId, message }) => {
         message = message.trim()
         if (message.trim().length > 0) {
             if (message[0].includes('/')) {
@@ -75,7 +75,7 @@ io.on('connection', (socket) => {
         }
     })
 
-    socket.on('refreshChannels', async () => {
+    socket.on('refreshChannels', () => {
         socket.emit('refresh channels')
     })
 })

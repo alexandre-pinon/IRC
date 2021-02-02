@@ -4,9 +4,7 @@ const Chatroom = mongoose.model('Chatroom')
 const Message = mongoose.model('Message')
 
 exports.nick = async (userId, newName) => {
-    if (paramIsEmpty(newName)) {
-        throw 'Name field is empty!'
-    }
+    if (paramIsEmpty(newName)) throw 'Name field is empty!'
 
     await User.findByIdAndUpdate(userId, { name: newName })
 
@@ -16,36 +14,26 @@ exports.nick = async (userId, newName) => {
 exports.list = async (string) => {
     const regex = new RegExp(string, 'i')
     const chatrooms = await Chatroom.find({ name: regex, private: false })
-    if (!chatrooms.length) {
-        throw 'No channels found!'
-    }
+
+    if (!chatrooms.length) throw 'No channels found!'
 
     return chatrooms
 }
 
 exports.create = async (userId, name) => {
 
-    if (paramIsEmpty(name)) {
-        throw 'Name field is empty!'
-    }
+    if (paramIsEmpty(name)) throw 'Name field is empty!'
 
-    const user = await User.findOne({ _id: userId })
     const nameRegex = /^[A-Za-z\s']+$/
+    if (!nameRegex.test(name)) throw 'Chatroom name can contain only alphabets.'
 
-    if (!nameRegex.test(name)) {
-        throw 'Chatroom name can contain only alphabets.'
-    }
+    const userPromise = User.findOne({ _id: userId })
+    const chatroomExistsPromise = Chatroom.findOne({ name })
+    const [ user, chatroomExists ] = await Promise.all([ userPromise, chatroomExistsPromise ])
 
-    const chatroomExists = await Chatroom.findOne({ name })
+    if (chatroomExists) throw 'Chatroom with that name already exists!'
 
-    if (chatroomExists) {
-        throw 'Chatroom with that name already exists!'
-    }
-
-    const chatroom = new Chatroom({
-        name,
-        users: [user]
-    })
+    const chatroom = new Chatroom({ name, users: [user] })
 
     await chatroom.save()
     const response = {
@@ -57,45 +45,32 @@ exports.create = async (userId, name) => {
 }
 
 exports.delete = async (name) => {
-    if (paramIsEmpty(name)) {
-        throw 'Name field is empty!'
-    }
+    if (paramIsEmpty(name)) throw 'Name field is empty!'
 
     const chatroom = await Chatroom.findOne({ name })
 
-    if (!chatroom) {
-        throw 'Channels does not exist!'
-    }
-    if (chatroom.private) {
-        throw 'Cannot delete private channels!'
-    }
-    await Message.deleteMany({ chatroom: chatroom._id })
-    await chatroom.delete()
+    if (!chatroom) throw 'Channel does not exist!'
+    if (chatroom.private) throw 'Cannot delete private channels!'
+
+    const deleteMessages = Message.deleteMany({ chatroom: chatroom._id })
+    const deleteChatroom = chatroom.delete()
+    await Promise.all([ deleteMessages, deleteChatroom ])
 
     return `Chatroom ${chatroom.name} deleted!`
 }
 
 exports.join = async (userId, name) => {
-    if (paramIsEmpty(name)) {
-        throw 'Name field is empty!'
-    }
+    if (paramIsEmpty(name)) throw 'Name field is empty!'
 
     const chatroom = await Chatroom.findOne({ name: name })
 
-    if (!chatroom) {
-        throw 'Channels does not exist!'
-    }
-    if (chatroom.private) {
-        throw 'Cannot join private channels!'
-    }
-
-    if (chatroom.users.includes(userId)) {
-        throw `You're already present in ${chatroom.name}!`
-    }
+    if (!chatroom) throw 'Channel does not exist!'
+    if (chatroom.private) throw 'Cannot join private channels!'
+    if (chatroom.users.includes(userId)) throw `You're already present in ${chatroom.name}!`
 
     const user = await User.findOne({ _id: userId })
 
-    await chatroom.users.push(user)
+    chatroom.users.push(user)
     await chatroom.save()
 
     const response = {
@@ -108,26 +83,17 @@ exports.join = async (userId, name) => {
 }
 
 exports.quit = async (userId, name) => {
-    if (paramIsEmpty(name)) {
-        throw 'Name field is empty!'
-    }
+    if (paramIsEmpty(name)) throw 'Name field is empty!'
 
     const chatroom = await Chatroom.findOne({ name: name })
 
-    if (!chatroom) {
-        throw 'Channels does not exist!'
-    }
-    if (chatroom.private) {
-        throw 'Cannot quit private channels!'
-    }
-
-    if (!chatroom.users.includes(userId)) {
-        throw `You're not present in ${chatroom.name}!`
-    }
+    if (!chatroom) throw 'Channels does not exist!'
+    if (chatroom.private) throw 'Cannot quit private channels!'
+    if (!chatroom.users.includes(userId)) throw `You're not present in ${chatroom.name}!`
 
     const user = await User.findOne({ _id: userId })
 
-    await chatroom.users.pull(user)
+    chatroom.users.pull(user)
     await chatroom.save()
 
     const response = {
@@ -140,36 +106,25 @@ exports.quit = async (userId, name) => {
 }
 
 exports.users = async (chatroomId) => {
-    const chatroom = await Chatroom.findOne({ _id: chatroomId }).populate({
-        path: 'users',
-        model: 'User'
-    })
+    const chatroom = await Chatroom
+                            .findOne({ _id: chatroomId })
+                            .populate({ path: 'users', model: 'User' })
 
-    if (!chatroom) {
-        throw 'Channels does not exist!'
-    }
-
-    if (!chatroom.users) {
-        throw 'There are no users in this channel!'
-    }
+    if (!chatroom) throw 'Channels does not exist!'
+    if (!chatroom.users) throw 'There are no users in this channel!'
 
     return chatroom.users
 }
 
 exports.msg = async (userSenderId, userReceiverName, message) => {
-    if (paramIsEmpty(userReceiverName)) {
-        throw 'No user precised!'
-    }
-    if (paramIsEmpty(message)) {
-        throw 'Message is empty!'
-    }
+    if (paramIsEmpty(userReceiverName)) throw 'No user precised!'
+    if (paramIsEmpty(message)) throw 'Message is empty!'
 
-    const sender = await User.findOne({ _id: userSenderId })
-    const receiver = await User.findOne({ name: userReceiverName })
+    const senderPromise = User.findOne({ _id: userSenderId })
+    const receiverPromise = User.findOne({ name: userReceiverName })
+    const [ sender, receiver ] = await Promise.all([ senderPromise, receiverPromise ])
 
-    if (!receiver) {
-        throw 'User does not exist!'
-    }
+    if (!receiver) throw 'User does not exist!'
 
     const chatroom = await Chatroom
                                 .findOne({
@@ -178,7 +133,6 @@ exports.msg = async (userSenderId, userReceiverName, message) => {
                                 })
                                 .populate({ path: 'users', model: 'User' })
     
-    console.log(chatroom)
     if (!chatroom) {
         const chatroom = new Chatroom({
             name: `${sender.name}&${receiver.name}`,
